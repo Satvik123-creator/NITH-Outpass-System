@@ -1,0 +1,35 @@
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { RequestProvider } from "./context/RequestContext";
+
+import Home from "./pages/Home";
+import Warden from "./pages/auth/warden";
+import Student from "./pages/auth/student";
+import StudentDashboard from "./pages/student/StudentDashboard";
+import WardenDashboard from "./pages/warden/WardenDashboard";
+import RequestOutpass from "./pages/student/RequestOutpass";
+import RequestDetails from "./pages/warden/RequestDetails";
+
+import "./App.css"; // Tailwind CSS import
+function App() {
+  return (
+    <AuthProvider>
+      <RequestProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login/warden" element={<Warden />} />
+            <Route path="/login/student" element={<Student />} />
+            <Route path="/student/dashboard" element={<StudentDashboard />} />
+            <Route path="/warden/dashboard" element={<WardenDashboard />} />
+            <Route path="/warden/request/:id" element={<RequestDetails />} />
+            <Route path="/student/request" element={<RequestOutpass />} />
+          </Routes>
+        </Router>
+      </RequestProvider>
+    </AuthProvider>
+  );
+}
+
+export default App;
