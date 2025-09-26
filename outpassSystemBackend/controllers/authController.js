@@ -89,17 +89,43 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     console.log("Login request body:", req.body);
-    const { enrollmentNo, employeeNo, password, role } = req.body;
+    // Accept either enrollment or enrollmentNo from client and normalize
+    let { enrollmentNo, employeeNo, password, role } = req.body;
+    // fallback for different frontend field names
+    if (!enrollmentNo && req.body.enrollment)
+      enrollmentNo = req.body.enrollment;
+
+    // normalize
+    if (enrollmentNo && typeof enrollmentNo === "string") {
+      enrollmentNo = enrollmentNo.trim().toUpperCase();
+    }
+    if (employeeNo && typeof employeeNo === "string") {
+      employeeNo = employeeNo.trim().toUpperCase();
+    }
+
+    // infer role if not provided
+    if (!role) {
+      if (enrollmentNo) role = "student";
+      else if (employeeNo) role = "warden";
+    }
 
     let user;
 
     if (role === "student") {
+      console.log("Looking up student by enrollmentNo", { enrollmentNo });
       user = await User.findOne({ enrollmentNo, role: "student" });
     } else if (role === "warden") {
+      console.log("Looking up warden by employeeNo", { employeeNo });
       user = await User.findOne({ employeeNo, role: "warden" });
     } else {
-      console.log("Login failed: invalid role", { role });
-      return res.status(400).json({ message: "Invalid role" });
+      console.log("Login failed: invalid or missing role", {
+        role,
+        enrollmentNo,
+        employeeNo,
+      });
+      return res
+        .status(400)
+        .json({ message: "Invalid role or missing credentials" });
     }
 
     if (!user) {

@@ -15,7 +15,7 @@ export default function StudentDashboard() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 relative">
+    <div className="min-h-screen bg-gray-50  relative">
       <Navbar/>
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-800 mb-6">

@@ -12,7 +12,7 @@ export default function StudentNavbar() {
   };
 
   return (
-    <nav className="bg-gray-900 text-white shadow-md">
+    <nav className="bg-gray-900 text-white shadow-md mb-4">
       <div className="container mx-auto flex items-center justify-between p-4">
         {/* Logo / Title */}
         <Link to="/" className="text-2xl font-bold hover:text-gray-300">

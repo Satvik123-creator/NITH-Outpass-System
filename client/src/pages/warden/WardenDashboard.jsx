@@ -3,7 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getAllOutpasses, updateOutpass } from "../../api/wardenAPI";
 import { useNavigate } from "react-router-dom";
 import StatusBadge from "../../components/StatusBadge";
-
+import Navbar from "../../components/Navbar";
 export default function WardenDashboard() {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -31,7 +31,8 @@ export default function WardenDashboard() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 pb-6 ">
+        <Navbar />
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-800 mb-6">
           Warden Dashboard
