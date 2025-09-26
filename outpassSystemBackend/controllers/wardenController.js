@@ -6,10 +6,22 @@ export const getAllOutpasses = async (req, res) => {
     const outpasses = await Outpass.find()
       .populate("student", "name enrollmentNo hostelName")
       .sort({ createdAt: -1 });
-    console.log(
-      `Warden ${req.user?._id} fetched all outpasses: count=${outpasses.length}`
+
+    // Restrict to outpasses for students in the warden's hostel
+    const wardenHostel = req.user?.hostelName;
+    if (!wardenHostel) {
+      console.log(`Warden ${req.user?._id} has no hostel assigned`);
+      return res.status(403).json({ message: "Warden has no hostel assigned" });
+    }
+
+    const filtered = outpasses.filter(
+      (op) => op.student && op.student.hostelName === wardenHostel
     );
-    res.json(outpasses);
+
+    console.log(
+      `Warden ${req.user?._id} fetched outpasses for hostel=${wardenHostel}: count=${filtered.length}`
+    );
+    res.json(filtered);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -22,7 +34,18 @@ export const getPendingOutpasses = async (req, res) => {
     const pendingOutpasses = await Outpass.find({ status: "pending" })
       .populate("student", "name enrollmentNo hostelName")
       .sort({ createdAt: -1 });
-    res.json(pendingOutpasses);
+
+    const wardenHostel = req.user?.hostelName;
+    if (!wardenHostel) {
+      console.log(`Warden ${req.user?._id} has no hostel assigned`);
+      return res.status(403).json({ message: "Warden has no hostel assigned" });
+    }
+
+    const filtered = pendingOutpasses.filter(
+      (op) => op.student && op.student.hostelName === wardenHostel
+    );
+
+    res.json(filtered);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -51,13 +74,25 @@ export const updateOutpass = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const outpass = await Outpass.findByIdAndUpdate(
-      id,
-      { status },
-      { new: true }
+    // fetch the outpass and populate student to verify hostel
+    const outpass = await Outpass.findById(id).populate(
+      "student",
+      "hostelName"
     );
     if (!outpass) return res.status(404).json({ message: "Outpass not found" });
 
+    const wardenHostel = req.user?.hostelName;
+    if (!wardenHostel)
+      return res.status(403).json({ message: "Warden has no hostel assigned" });
+
+    if (!outpass.student || outpass.student.hostelName !== wardenHostel) {
+      return res
+        .status(403)
+        .json({ message: "You do not have permission to update this outpass" });
+    }
+
+    outpass.status = status;
+    await outpass.save();
     res.json(outpass);
   } catch (error) {
     console.error(error);
