@@ -8,22 +8,21 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 const Student = () => {
   const navigate = useNavigate();
-  const { login, signup } = useAuth(); // ✅ Use context
+  const { login, signup } = useAuth();
 
   const [name, setName] = useState("");
   const [enrollment, setEnrollment] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hostel, setHostel] = useState("");
-  const [otp, setOtp] = useState(0);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [selectedOption, setSelectedOption] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isSubmitted, setIsSubmitted] = useState(false); // whether OTP sent and waiting for code
+  const [showRegister, setShowRegister] = useState(false); // toggle between login and register
+  const [selectedOption, setSelectedOption] = useState(null);
 
-  // ✅ Login handler
   const handleStudentLogin = async (e) => {
     e.preventDefault();
     try {
-      // send the field name expected by the backend
       await login({ enrollmentNo: enrollment, password, role: "student" });
       toast.success("Login successful");
       navigate("/student/dashboard");
@@ -32,33 +31,26 @@ const Student = () => {
     }
   };
 
-  // ✅ Register handler
   const handleStudentRegister = async (e) => {
     e.preventDefault();
-    const isValidDomain = email.endsWith("@nith.ac.in");
-    if (!isValidDomain) {
+    if (!email.endsWith("@nith.ac.in")) {
       toast.error("Invalid email, please enter NITH email Id");
       return;
     }
 
     try {
-      // Send OTP
       await axios.post(`${API_URL}/auth/send-otp`, { email });
       toast.success("OTP sent to your email");
-      setIsSubmitted(true); // show OTP input
-    } catch (error) {
+      setIsSubmitted(true);
+    } catch (err) {
       toast.error("Failed to send OTP");
     }
   };
 
-  // Replace handleOtpSubmitted with:
   const handleOtpSubmitted = async (e) => {
     e.preventDefault();
     try {
-      // Verify OTP
       await axios.post(`${API_URL}/auth/verify-otp`, { email, otp });
-
-      // Call signup function after OTP verification
       await signup({
         name,
         enrollmentNo: enrollment,
@@ -67,23 +59,43 @@ const Student = () => {
         hostelName: hostel,
         role: "student",
       });
-
       toast.success("Signup successful");
       navigate("/student/dashboard");
-    } catch (error) {
-      toast.error(error.response?.data?.message || "OTP verification failed");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "OTP verification failed");
     }
   };
 
-  const handleHostelChange = (selectedOption) => {
-    setSelectedOption(selectedOption);
-    setHostel(selectedOption.value);
+  const handleHostelChange = (opt) => {
+    setSelectedOption(opt);
+    setHostel(opt?.value || "");
   };
+
+  const hostelOptions = [
+    { value: "Kailash Boys Hostel", label: "Kailash Boys Hostel" },
+    { value: "Shivalik Boys Hostel", label: "Shivalik Boys Hostel" },
+    { value: "Dhauladhar Boys Hostel", label: "Dhauladhar Boys Hostel" },
+    { value: "Vindhyachal Boys Hostel", label: "Vindhyachal Boys Hostel" },
+    { value: "Neelkanth Boys Hostel", label: "Neelkanth Boys Hostel" },
+    { value: "Himadri Hostel", label: "Himadri Hostel" },
+    { value: "Himgiri Hostel", label: "Himgiri Hostel" },
+    { value: "Udaygiri Hostel", label: "Udaygiri Hostel" },
+    { value: "Parvati Girls Hostel", label: "Parvati Girls Hostel" },
+    { value: "Ambika Girls Hostel", label: "Ambika Girls Hostel" },
+    { value: "Aravali Hostel (Girls)", label: "Aravali Hostel (Girls)" },
+    { value: "Manimahesh Girls Hostel", label: "Manimahesh Girls Hostel" },
+    { value: "Satpura Hostel", label: "Satpura Hostel" },
+  ];
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white">
       <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold">Welcome</h1>
+        <img
+          src="/nith_logo.jpg"
+          alt="NITH logo"
+          className="mx-auto w-28 mb-4"
+        />
+        <h1 className="text-3xl font-bold">NITH Outpass Portal</h1>
         <h2 className="text-lg text-gray-300">
           Please login using your webkiosk credentials
         </h2>
@@ -95,165 +107,148 @@ const Student = () => {
             <h2 className="text-xl font-semibold mb-4 text-center">
               Email Verification
             </h2>
-            <div>
-              <p className="text-sm text-gray-300 mb-3">
-                Please check your email id and enter the OTP
-              </p>
-              <form
-                onSubmit={handleOtpSubmitted}
-                className="flex flex-col gap-4"
-              >
-                <input
-                  type="number"
-                  name="otp"
-                  placeholder="Enter the OTP"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setOtp(e.target.value)}
-                  required
-                />
+            <p className="text-sm text-gray-300 mb-3">
+              Please check your email id and enter the OTP
+            </p>
+            <form onSubmit={handleOtpSubmitted} className="flex flex-col gap-4">
+              <input
+                type="number"
+                name="otp"
+                placeholder="Enter the OTP"
+                className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                required
+              />
+              <div className="flex gap-3">
                 <button
                   type="submit"
                   className="w-full bg-blue-600 hover:bg-blue-700 transition-colors py-2 rounded-md font-medium"
                 >
                   Verify
                 </button>
-              </form>
-            </div>
+                <button
+                  type="button"
+                  onClick={() => setIsSubmitted(false)}
+                  className="w-full bg-gray-600 hover:bg-gray-700 transition-colors py-2 rounded-md"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         ) : (
           <>
-            {/* ------- Login -------- */}
-            <div className="mb-8">
-              <p className="text-sm mb-3">Registered Student? Login Now</p>
-              <form
-                className="flex flex-col gap-4"
-                onSubmit={handleStudentLogin}
-              >
-                <input
-                  type="text"
-                  placeholder="Enrollment Number"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setEnrollment(e.target.value.toUpperCase())}
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-green-600 hover:bg-green-700 transition-colors py-2 rounded-md font-medum cursor-pointer"
+            {!showRegister ? (
+              <div className="mb-8">
+                <p className="text-sm mb-3">Registered Student? Login Now</p>
+                <form
+                  className="flex flex-col gap-4"
+                  onSubmit={handleStudentLogin}
                 >
-                  Login
-                </button>
-              </form>
-              <p
-                className="mt-3 text-blue-400 hover:underline cursor-pointer text-sm"
-                onClick={() => navigate("/StudentForgotPassword")}
-              >
-                Forgot Password?
-              </p>
-            </div>
-
-            {/* ------- Register -------- */}
-            <div>
-              <p className="text-sm mb-3">
-                Still didn't register? Register Here
-              </p>
-              <form
-                className="flex flex-col gap-4"
-                onSubmit={handleStudentRegister}
-              >
-                <input
-                  type="text"
-                  placeholder="Full Name"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setName(e.target.value.toUpperCase())}
-                  required
-                />
-                <input
-                  type="text"
-                  placeholder="Enrollment Number"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setEnrollment(e.target.value.toUpperCase())}
-                  required
-                />
-                <input
-                  type="email"
-                  placeholder="Email Address (@nith.ac.in)"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-                <input
-                  type="password"
-                  placeholder="Password"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-                <label htmlFor="hostel" className="text-sm font-medium">
-                  Hostel No.
-                </label>
-                <Select
-                  value={selectedOption}
-                  onChange={handleHostelChange}
-                  options={[
-                    {
-                      value: "Kailash Boys Hostel",
-                      label: "Kailash Boys Hostel",
-                    },
-                    {
-                      value: "Shivalik Boys Hostel",
-                      label: "Shivalik Boys Hostel",
-                    },
-                    {
-                      value: "Dhauladhar Boys Hostel",
-                      label: "Dhauladhar Boys Hostel",
-                    },
-                    {
-                      value: "Vindhyachal Boys Hostel",
-                      label: "Vindhyachal Boys Hostel",
-                    },
-                    {
-                      value: "Neelkanth Boys Hostel",
-                      label: "Neelkanth Boys Hostel",
-                    },
-                    { value: "Himadri Hostel", label: "Himadri Hostel" },
-                    { value: "Himgiri Hostel", label: "Himgiri Hostel" },
-                    { value: "Udaygiri Hostel", label: "Udaygiri Hostel" },
-                    {
-                      value: "Parvati Girls Hostel",
-                      label: "Parvati Girls Hostel",
-                    },
-                    {
-                      value: "Ambika Girls Hostel",
-                      label: "Ambika Girls Hostel",
-                    },
-                    {
-                      value: "Aravali Hostel (Girls)",
-                      label: "Aravali Hostel (Girls)",
-                    },
-                    {
-                      value: "Manimahesh Girls Hostel",
-                      label: "Manimahesh Girls Hostel",
-                    },
-                    { value: "Satpura Hostel", label: "Satpura Hostel" },
-                  ]}
-                  placeholder="Select your hostel.."
-                  required
-                />
-                <button
-                  type="submit"
-                  className="w-full bg-purple-600 hover:bg-purple-700 transition-colors py-2 rounded-md font-medium cursor-pointer"
+                  <input
+                    type="text"
+                    placeholder="Enrollment Number"
+                    className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) =>
+                      setEnrollment(e.target.value.toUpperCase())
+                    }
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="w-full bg-green-600 hover:bg-green-700 transition-colors py-2 rounded-md font-medium"
+                  >
+                    Login
+                  </button>
+                </form>
+                <div className="mt-3 flex justify-between items-center">
+                  <button
+                    className="text-blue-400 hover:underline text-sm"
+                    onClick={() => setShowRegister(true)}
+                  >
+                    Don't have an account? Sign up
+                  </button>
+                  <button
+                    className="text-blue-400 hover:underline text-sm"
+                    onClick={() => navigate("/StudentForgotPassword")}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm mb-3">Create a student account</p>
+                <form
+                  className="flex flex-col gap-4"
+                  onSubmit={handleStudentRegister}
                 >
-                  Register
-                </button>
-              </form>
-            </div>
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setName(e.target.value.toUpperCase())}
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Enrollment Number"
+                    className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) =>
+                      setEnrollment(e.target.value.toUpperCase())
+                    }
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email Address (@nith.ac.in)"
+                    className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <label htmlFor="hostel" className="text-sm font-medium">
+                    Hostel No.
+                  </label>
+                  <Select
+                    value={selectedOption}
+                    onChange={handleHostelChange}
+                    options={hostelOptions}
+                    placeholder="Select your hostel.."
+                    required
+                  />
+                  <div className="flex gap-3">
+                    <button
+                      type="submit"
+                      className="w-full bg-purple-600 hover:bg-purple-700 transition-colors py-2 rounded-md font-medium"
+                    >
+                      Register
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowRegister(false)}
+                      className="w-full bg-gray-600 hover:bg-gray-700 transition-colors py-2 rounded-md"
+                    >
+                      Back
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
           </>
         )}
       </div>
