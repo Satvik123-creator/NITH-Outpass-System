@@ -1,1 +1,33 @@
 @import "tailwindcss";
+
+:root {
+  --nith-primary: #0b5fff; /* a strong blue */
+  --nith-accent: #6b46c1; /* purple accent */
+  --card-bg: #0f1724; /* dark card background */
+}
+
+.bg-card-bg {
+  background-color: var(--card-bg);
+}
+.btn-primary {
+  background-color: var(--nith-primary);
+}
+.btn-primary:hover {
+  background-color: #0947c6;
+}
+.btn-accent {
+  background-color: var(--nith-accent);
+}
+.btn-accent:hover {
+  background-color: #5a35a8;
+}
+
+.input-base {
+  background-color: #0b1220;
+  color: #fff;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+.muted {
+  color: #9aa4b2;
+}

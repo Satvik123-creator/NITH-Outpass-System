@@ -4,6 +4,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
+import AuthCard from "../../components/AuthCard";
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Student = () => {
@@ -101,7 +102,7 @@ const Student = () => {
         </h2>
       </div>
 
-      <div className="w-full max-w-md bg-gray-800 rounded-xl shadow-lg p-6">
+      <AuthCard>
         {isSubmitted ? (
           <div>
             <h2 className="text-xl font-semibold mb-4 text-center">
@@ -251,7 +252,7 @@ const Student = () => {
             )}
           </>
         )}
-      </div>
+      </AuthCard>
     </div>
   );
 };

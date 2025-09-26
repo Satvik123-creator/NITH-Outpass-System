@@ -8,35 +8,40 @@ export default function StudentNavbar() {
 
   const handleLogout = () => {
     logout();
-    navigate("/"); // redirect to login after logout
+    navigate("/");
   };
 
   return (
-    <nav className="bg-gray-900 text-white shadow-md mb-4">
+    <nav className="bg-[#071133] text-white shadow-md">
       <div className="container mx-auto flex items-center justify-between p-4">
-        {/* Logo / Title */}
-        <Link to="/" className="text-2xl font-bold hover:text-gray-300">
-          NITH Outpass Portal
+        <Link to="/" className="flex items-center gap-3">
+          <img
+            src="/nith_logo.jpg"
+            alt="NITH"
+            className="w-10 h-10 rounded-md"
+          />
+          <div>
+            <div className="text-lg font-semibold">NITH Outpass</div>
+            <div className="text-sm muted">Student & Warden Portal</div>
+          </div>
         </Link>
 
-        {/* Navigation / User Info */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           {authUser ? (
             <>
-              <span className="font-medium">Welcome, {authUser.name}</span>
-             
+              <div className="text-sm">
+                <div className="font-medium">{authUser.name}</div>
+                <div className="text-xs muted">{authUser.role}</div>
+              </div>
               <button
                 onClick={handleLogout}
-                className="bg-red-600 px-3 py-1 rounded hover:bg-red-500 transition"
+                className="btn-accent text-white px-3 py-1 rounded"
               >
                 Logout
               </button>
             </>
           ) : (
-            <Link
-              to="/"
-              className="bg-blue-600 px-3 py-1 rounded hover:bg-blue-500 transition"
-            >
+            <Link to="/" className="btn-primary text-white px-3 py-1 rounded">
               Login / Signup
             </Link>
           )}
