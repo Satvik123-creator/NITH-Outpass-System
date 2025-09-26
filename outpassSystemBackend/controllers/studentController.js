@@ -55,3 +55,27 @@ export const getPendingOutpasses = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+// Get a single outpass by id for the logged-in student
+export const getOutpassById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const outpass = await Outpass.findById(id).populate(
+      "student",
+      "name enrollmentNo hostelName email"
+    );
+    if (!outpass) return res.status(404).json({ message: "Outpass not found" });
+
+    // ensure the requesting student owns this outpass
+    if (String(outpass.student._id) !== String(req.user._id)) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view this outpass" });
+    }
+
+    res.json(outpass);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

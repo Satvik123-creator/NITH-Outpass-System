@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useRequests } from "../../context/RequestContext";
 import StatusBadge from "../../components/StatusBadge";
-import Navbar from "../../components/Navbar"
+import Navbar from "../../components/Navbar";
 export default function StudentDashboard() {
   const { requests } = useRequests();
   const navigate = useNavigate();
@@ -16,7 +16,7 @@ export default function StudentDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50  relative">
-      <Navbar/>
+      <Navbar />
       <div className="max-w-4xl mx-auto">
         <h2 className="text-3xl font-bold text-gray-800 mb-6">
           Student Dashboard
@@ -56,7 +56,8 @@ export default function StudentDashboard() {
               {previous.map((r) => (
                 <li
                   key={r._id}
-                  className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow-sm hover:shadow-md transition"
+                  onClick={() => navigate(`/student/outpass/${r._id}`)}
+                  className="cursor-pointer flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow-sm hover:shadow-md transition"
                 >
                   <span className="text-gray-700 font-medium">{r.reason}</span>
                   <StatusBadge status={r.status} />

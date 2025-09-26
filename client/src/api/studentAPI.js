@@ -34,3 +34,14 @@ export const createOutpass = async (formData, token) => {
 
   return res.data;
 };
+
+/**
+ * Get a single outpass by id for the logged-in student
+ */
+export const getOutpassById = async (id, token) => {
+  if (!token) throw new Error("No token provided for getOutpassById");
+  const res = await axios.get(`${API_URL}/outpass/${id}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+};

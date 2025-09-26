@@ -3,6 +3,7 @@ import {
   createOutpass,
   getStudentOutpasses,
   getPendingOutpasses,
+  getOutpassById,
 } from "../controllers/studentController.js";
 import { protect, authorizeRoles } from "../middlewares/authMiddleware.js";
 
@@ -16,5 +17,8 @@ router.get("/all", protect, authorizeRoles("student"), getStudentOutpasses);
 
 // Get pending outpasses
 router.get("/pending", protect, authorizeRoles("student"), getPendingOutpasses);
+
+// Get single outpass by id (history/details)
+router.get("/:id", protect, authorizeRoles("student"), getOutpassById);
 
 export default router;

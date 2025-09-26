@@ -10,6 +10,7 @@ import StudentDashboard from "./pages/student/StudentDashboard";
 import WardenDashboard from "./pages/warden/WardenDashboard";
 import RequestOutpass from "./pages/student/RequestOutpass";
 import RequestDetails from "./pages/warden/RequestDetails";
+import StudentRequestDetails from "./pages/student/StudentRequestDetails";
 
 import "./App.css"; // Tailwind CSS import
 function App() {
@@ -24,6 +25,10 @@ function App() {
             <Route path="/student/dashboard" element={<StudentDashboard />} />
             <Route path="/warden/dashboard" element={<WardenDashboard />} />
             <Route path="/warden/request/:id" element={<RequestDetails />} />
+            <Route
+              path="/student/outpass/:id"
+              element={<StudentRequestDetails />}
+            />
             <Route path="/student/request" element={<RequestOutpass />} />
           </Routes>
         </Router>
