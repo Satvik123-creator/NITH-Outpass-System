@@ -31,38 +31,42 @@ export default function StudentRequestDetails() {
   if (!outpass) return <div className="p-6">Outpass not found</div>;
 
   return (
-    <div className="min-h-screen p-6 bg-gray-50">
-      <div className="max-w-3xl mx-auto bg-white rounded-lg p-6 shadow">
-        <h2 className="text-2xl font-semibold mb-4">Outpass Details</h2>
+    <div className="min-h-screen p-6 bg-gray-900 text-white">
+      <div className="max-w-3xl mx-auto bg-gray-800 rounded-lg p-6">
+        <h2 className="text-2xl font-semibold mb-4">Outpass Request Details</h2>
 
         <div className="mb-4">
-          <h3 className="text-lg font-medium">Outpass Info</h3>
-          <p className="text-sm text-gray-700">
-            From: {new Date(outpass.fromDate || outpass.from).toLocaleString()}
+          <h3 className="text-lg font-medium">Student</h3>
+          <p className="text-sm text-gray-300">Name: {outpass.student?.name}</p>
+          <p className="text-sm text-gray-300">
+            Enrollment: {outpass.student?.enrollmentNo}
           </p>
-          <p className="text-sm text-gray-700">
-            To: {new Date(outpass.toDate || outpass.to).toLocaleString()}
+          <p className="text-sm text-gray-300">
+            Email: {outpass.student?.email}
           </p>
-          <p className="text-sm text-gray-700">
-            Purpose: {outpass.reason || outpass.purpose}
+          <p className="text-sm text-gray-300">
+            Hostel: {outpass.student?.hostelName}
           </p>
-          <p className="text-sm text-gray-700">Status: {outpass.status}</p>
         </div>
 
         <div className="mb-4">
-          <h3 className="text-lg font-medium">Contact / Address</h3>
-          <p className="text-sm text-gray-700">
-            Address on leave: {outpass.addressOnLeave || outpass.address}
+          <h3 className="text-lg font-medium">Outpass Info</h3>
+          <p className="text-sm text-gray-300">
+            From: {new Date(outpass.fromDate || outpass.from).toLocaleString()}
           </p>
-          <p className="text-sm text-gray-700">
-            Room Number: {outpass.roomNumber}
+          <p className="text-sm text-gray-300">
+            To: {new Date(outpass.toDate || outpass.to).toLocaleString()}
           </p>
+          <p className="text-sm text-gray-300">
+            Purpose: {outpass.reason || outpass.purpose}
+          </p>
+          <p className="text-sm text-gray-300">Status: {outpass.status}</p>
         </div>
 
         <div className="flex gap-3">
           <button
             onClick={() => navigate(-1)}
-            className="px-4 py-2 bg-gray-600 text-white rounded-md"
+            className="px-4 py-2 bg-gray-600 rounded-md hover:bg-gray-700"
           >
             Back
           </button>
