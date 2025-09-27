@@ -4,6 +4,15 @@ import { getAllOutpasses, updateOutpass } from "../../api/wardenAPI";
 import { useNavigate } from "react-router-dom";
 import StatusBadge from "../../components/StatusBadge";
 import Navbar from "../../components/Navbar";
+
+function formatDateTime(dt) {
+  try {
+    return new Date(dt).toLocaleString();
+  } catch (e) {
+    return dt;
+  }
+}
+
 export default function WardenDashboard() {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -31,98 +40,162 @@ export default function WardenDashboard() {
     : [];
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-6 ">
-        <Navbar />
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">
-          Warden Dashboard
-        </h2>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <Navbar />
 
-        {/* Pending Outpasses */}
-        <div className="bg-white shadow-lg rounded-xl p-6 mb-8">
-          <h3 className="text-xl font-semibold text-yellow-600 mb-4">
-            Pending Outpasses
-          </h3>
-          {pending.length === 0 ? (
-            <p className="text-gray-500 italic">No pending outpasses.</p>
-          ) : (
-            <ul className="space-y-3">
-              {pending.map((r) => (
-                <li
-                  key={r._id}
-                  className="flex flex-col sm:flex-row sm:justify-between sm:items-center bg-yellow-50 p-4 rounded-lg shadow-sm hover:shadow-md transition"
-                >
-                  <div>
-                    <p className="text-gray-700 font-medium">
-                      {r.reason || r.purpose}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Applied on: {new Date(r.createdAt).toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="mt-3 sm:mt-0 flex gap-3">
-                    <button
-                      onClick={() => navigate(`/warden/request/${r._id}`)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition"
-                    >
-                      View
-                    </button>
-                    <button
-                      onClick={() => handleUpdate(r._id, "approved")}
-                      className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg transition"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => handleUpdate(r._id, "rejected")}
-                      className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="flex items-start justify-between gap-6 mb-8">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900">
+              Warden Dashboard
+            </h1>
+            <p className="mt-2 text-sm text-gray-600">
+              Manage and review student outpass requests for your hostel.
+            </p>
+          </div>
         </div>
 
-        {/* Previous Outpasses */}
-        <div className="bg-white shadow-lg rounded-xl p-6">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4">
-            Previous Outpasses
-          </h3>
-          {previous.length === 0 ? (
-            <p className="text-gray-500 italic">No previous outpasses.</p>
-          ) : (
-            <ul className="space-y-3">
-              {previous.map((r) => (
-                <li
-                  key={r._id}
-                  className="flex justify-between items-center bg-gray-100 p-4 rounded-lg shadow-sm hover:shadow-md transition"
-                >
-                  <div>
-                    <p className="text-gray-700 font-medium">
-                      {r.reason || r.purpose}
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Applied on: {new Date(r.createdAt).toLocaleString()}
-                    </p>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <section className="lg:col-span-2">
+            <div className="bg-white border border-gray-100 rounded-2xl shadow p-6 mb-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-yellow-600">
+                  Pending Outpasses
+                </h2>
+                <div className="text-sm text-gray-500">
+                  {pending.length} pending
+                </div>
+              </div>
+
+              <div className="mt-4">
+                {pending.length === 0 ? (
+                  <div className="py-8 text-center text-gray-500">
+                    No pending outpasses
                   </div>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => navigate(`/warden/request/${r._id}`)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-lg transition"
-                    >
-                      View
-                    </button>
-                    <StatusBadge status={r.status} />
+                ) : (
+                  <ul className="space-y-3">
+                    {pending.map((r) => (
+                      <li
+                        key={r._id}
+                        className="group bg-yellow-50 hover:bg-yellow-100 border border-transparent hover:border-yellow-200 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition"
+                      >
+                        <div>
+                          <div className="font-medium text-gray-800">
+                            {r.reason || r.purpose}
+                          </div>
+                          <div className="text-sm text-gray-600 mt-1">
+                            Applied on: {formatDateTime(r.createdAt)}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            Student: {r.student?.name} •{" "}
+                            {r.student?.enrollmentNo}
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3 mt-3 sm:mt-0">
+                          <button
+                            onClick={() => navigate(`/warden/request/${r._id}`)}
+                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                          >
+                            View
+                          </button>
+                          <button
+                            onClick={() => handleUpdate(r._id, "approved")}
+                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => handleUpdate(r._id, "rejected")}
+                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+
+            <div className="bg-white border border-gray-100 rounded-2xl shadow p-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-lg font-semibold text-gray-800">
+                  Previous Outpasses
+                </h2>
+                <div className="text-sm text-gray-500">
+                  {previous.length} total
+                </div>
+              </div>
+
+              <div className="mt-4">
+                {previous.length === 0 ? (
+                  <div className="py-8 text-center text-gray-500">
+                    No previous outpasses
                   </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                ) : (
+                  <ul className="space-y-3">
+                    {previous.map((r) => (
+                      <li
+                        key={r._id}
+                        className="bg-white hover:bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center justify-between gap-4 transition"
+                      >
+                        <div>
+                          <div className="font-medium text-gray-800">
+                            {r.reason || r.purpose}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            Applied on: {formatDateTime(r.createdAt)}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            {r.student?.name} • {r.student?.enrollmentNo}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => navigate(`/warden/request/${r._id}`)}
+                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                          >
+                            View
+                          </button>
+                          <StatusBadge status={r.status} />
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <aside className="hidden lg:block">
+            <div className="sticky top-24 space-y-4">
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow">
+                <h3 className="text-sm font-medium text-gray-700">Summary</h3>
+                <div className="mt-3 text-2xl font-bold text-gray-900">
+                  {requests?.length || 0}
+                </div>
+                <div className="text-sm text-gray-500">Total requests</div>
+              </div>
+
+              <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow">
+                <h3 className="text-sm font-medium text-gray-700">
+                  Quick Actions
+                </h3>
+                <div className="mt-2 flex flex-col gap-2">
+                  <button
+                    onClick={fetchRequests}
+                    className="text-sm px-3 py-2 bg-gray-100 rounded-md"
+                  >
+                    Refresh
+                  </button>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
