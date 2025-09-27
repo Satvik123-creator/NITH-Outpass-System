@@ -95,19 +95,19 @@ export default function WardenDashboard() {
                         <div className="flex items-center gap-3 mt-3 sm:mt-0">
                           <button
                             onClick={() => navigate(`/warden/request/${r._id}`)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            className="btn btn-md btn-blue"
                           >
                             View
                           </button>
                           <button
                             onClick={() => handleUpdate(r._id, "approved")}
-                            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
+                            className="btn btn-md btn-green"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleUpdate(r._id, "rejected")}
-                            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                            className="btn btn-md btn-red"
                           >
                             Reject
                           </button>
@@ -155,7 +155,7 @@ export default function WardenDashboard() {
                         <div className="flex items-center gap-3">
                           <button
                             onClick={() => navigate(`/warden/request/${r._id}`)}
-                            className="px-3 py-1 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                            className="btn btn-sm btn-blue"
                           >
                             View
                           </button>
@@ -186,7 +186,7 @@ export default function WardenDashboard() {
                 <div className="mt-2 flex flex-col gap-2">
                   <button
                     onClick={fetchRequests}
-                    className="text-sm px-3 py-2 bg-gray-100 rounded-md"
+                    className="btn btn-sm btn-neutral"
                   >
                     Refresh
                   </button>

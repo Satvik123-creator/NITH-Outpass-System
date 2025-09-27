@@ -125,16 +125,13 @@ const Warden = () => {
                   required
                 />
                 <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    className="w-full bg-blue-600 hover:bg-blue-700 transition-colors py-2 rounded-md font-medium"
-                  >
+                  <button type="submit" className="btn btn-md btn-blue w-full">
                     Verify
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsSubmitted(false)}
-                    className="w-full bg-gray-600 hover:bg-gray-700 transition-colors py-2 rounded-md"
+                    className="btn btn-md btn-neutral w-full"
                   >
                     Cancel
                   </button>
@@ -168,7 +165,7 @@ const Warden = () => {
                     />
                     <button
                       type="submit"
-                      className="w-full bg-green-600 hover:bg-green-700 transition-colors py-2 rounded-md font-medium"
+                      className="btn btn-md btn-green w-full"
                     >
                       Login
                     </button>
@@ -237,14 +234,14 @@ const Warden = () => {
                     <div className="flex gap-3">
                       <button
                         type="submit"
-                        className="w-full bg-purple-600 hover:bg-purple-700 transition-colors py-2 rounded-md font-medium"
+                        className="btn btn-md btn-accent w-full"
                       >
                         Register
                       </button>
                       <button
                         type="button"
                         onClick={() => setShowRegister(false)}
-                        className="w-full bg-gray-600 hover:bg-gray-700 transition-colors py-2 rounded-md"
+                        className="btn btn-md btn-neutral w-full"
                       >
                         Back
                       </button>

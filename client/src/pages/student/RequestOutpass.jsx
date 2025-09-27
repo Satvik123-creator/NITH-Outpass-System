@@ -60,7 +60,9 @@ export default function OutpassForm() {
           {/* top row */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <div>
-              <label className="text-sm text-white/90 mb-2 block">Full Name</label>
+              <label className="text-sm text-white/90 mb-2 block">
+                Full Name
+              </label>
               <input
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -71,7 +73,9 @@ export default function OutpassForm() {
             </div>
 
             <div>
-              <label className="text-sm text-white/90 mb-2 block">Enrollment No.</label>
+              <label className="text-sm text-white/90 mb-2 block">
+                Enrollment No.
+              </label>
               <input
                 value={enrollment}
                 onChange={(e) => setEnrollment(e.target.value.toUpperCase())}
@@ -82,7 +86,9 @@ export default function OutpassForm() {
             </div>
 
             <div>
-              <label className="text-sm text-white/90 mb-2 block">Room Number</label>
+              <label className="text-sm text-white/90 mb-2 block">
+                Room Number
+              </label>
               <input
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
@@ -95,7 +101,9 @@ export default function OutpassForm() {
           {/* dates */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6 items-end">
             <div>
-              <label className="text-sm text-white/90 mb-2 block">Duration</label>
+              <label className="text-sm text-white/90 mb-2 block">
+                Duration
+              </label>
               <div className="flex gap-3 items-center">
                 <div className="flex-1">
                   <label className="text-xs text-white/80">From</label>
@@ -121,7 +129,9 @@ export default function OutpassForm() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="text-sm text-white/90 mb-2 block">Address on Leave</label>
+              <label className="text-sm text-white/90 mb-2 block">
+                Address on Leave
+              </label>
               <input
                 value={addressOnLeave}
                 onChange={(e) => setAddressOnLeave(e.target.value)}
@@ -133,7 +143,9 @@ export default function OutpassForm() {
 
           {/* purpose */}
           <div className="mb-6">
-            <label className="text-sm text-white/90 mb-2 block">Purpose of Leave</label>
+            <label className="text-sm text-white/90 mb-2 block">
+              Purpose of Leave
+            </label>
             <textarea
               value={purpose}
               onChange={(e) => setPurpose(e.target.value)}
@@ -149,16 +161,21 @@ export default function OutpassForm() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-transparent border border-white/80 text-white px-6 py-2 rounded-full hover:bg-white/10 transition"
+              className="btn btn-md btn-neutral rounded-full"
             >
               {loading ? "Submitting..." : "Apply"}
             </button>
 
             <div className="text-sm text-white/80">
               <div>
-                Submitted as: <span className="font-medium">{authUser?.name || "Student"}</span>
+                Submitted as:{" "}
+                <span className="font-medium">
+                  {authUser?.name || "Student"}
+                </span>
               </div>
-              <div className="text-xs mt-1">Status will be visible in your dashboard</div>
+              <div className="text-xs mt-1">
+                Status will be visible in your dashboard
+              </div>
             </div>
           </div>
         </form>

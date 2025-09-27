@@ -33,15 +33,12 @@ export default function StudentNavbar() {
                 <div className="font-medium">{authUser.name}</div>
                 <div className="text-xs muted">{authUser.role}</div>
               </div>
-              <button
-                onClick={handleLogout}
-                className="btn-accent text-white px-3 py-1 rounded"
-              >
+              <button onClick={handleLogout} className="btn btn-sm btn-accent">
                 Logout
               </button>
             </>
           ) : (
-            <Link to="/" className="btn-primary text-white px-3 py-1 rounded">
+            <Link to="/" className="btn btn-sm btn-primary">
               Login / Signup
             </Link>
           )}

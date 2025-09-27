@@ -31,3 +31,54 @@
 .muted {
   color: #9aa4b2;
 }
+
+/* Shared button utilities (use with className="btn btn-md btn-blue" etc) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem; /* rounded-md */
+  font-size: 0.875rem; /* text-sm */
+  font-weight: 500;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  border: none;
+}
+.btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+.btn-md {
+  padding: 0.5rem 1rem; /* py-2 px-4 */
+}
+.btn-sm {
+  padding: 0.375rem 0.75rem; /* py-1.5 px-3 */
+}
+.btn-blue {
+  background-color: #2563eb; /* blue-600 */
+  color: #ffffff;
+}
+.btn-blue:hover {
+  background-color: #1d4ed8;
+}
+.btn-green {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+.btn-green:hover {
+  background-color: #15803d;
+}
+.btn-red {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+.btn-red:hover {
+  background-color: #b91c1c;
+}
+.btn-neutral {
+  background-color: #f3f4f6;
+  color: #111827;
+}
+.btn-neutral:hover {
+  background-color: #e5e7eb;
+}

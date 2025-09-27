@@ -42,7 +42,7 @@ export default function StudentDashboard() {
           <div className="hidden sm:flex items-center gap-3">
             <button
               onClick={() => navigate("/student/request")}
-              className="inline-flex items-center gap-2 px-4 py-2 btn-primary text-white rounded-md shadow"
+              className="btn btn-md btn-blue shadow"
             >
               + Apply for Outpass
             </button>
@@ -181,7 +181,7 @@ export default function StudentDashboard() {
       {/* Mobile floating apply button */}
       <button
         onClick={() => navigate("/student/request")}
-        className="fixed bottom-6 right-6 sm:hidden bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition"
+        className="fixed bottom-6 right-6 sm:hidden btn btn-md btn-blue rounded-full shadow-lg"
         aria-label="Apply for outpass"
       >
         +
