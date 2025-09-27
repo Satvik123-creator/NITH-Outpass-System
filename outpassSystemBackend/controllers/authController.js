@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
+import crypto from "crypto";
 // ================= Signup =================
 export const signup = async (req, res) => {
   try {
@@ -223,5 +224,73 @@ export const verifyOtp = (req, res) => {
     res.status(200).json({ message: "OTP verified successfully" });
   } else {
     res.status(400).json({ message: "Invalid OTP" });
+  }
+};
+
+// Forgot password - send reset link
+export const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  if (!email) return res.status(400).json({ message: "Email is required" });
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    // create token
+    const token = crypto.randomBytes(20).toString("hex");
+    user.resetPasswordToken = token;
+    user.resetPasswordExpires = Date.now() + 1000 * 60 * 60; // 1 hour
+    await user.save();
+
+    const resetUrl = `${
+      process.env.FRONTEND_URL || "http://localhost:3000"
+    }/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: "Password Reset - NITH Outpass Portal",
+      text: `You requested a password reset. Click the link to reset your password: ${resetUrl} \nThis link is valid for 1 hour.`,
+    };
+
+    await transporter.sendMail(mailOptions);
+    res.json({ message: "Password reset email sent" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Reset password using token
+export const resetPassword = async (req, res) => {
+  const { token, email, newPassword } = req.body;
+  if (!token || !email || !newPassword)
+    return res.status(400).json({ message: "Missing parameters" });
+
+  try {
+    const user = await User.findOne({
+      email,
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+    if (!user)
+      return res.status(400).json({ message: "Invalid or expired token" });
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    user.password = hashed;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+    await user.save();
+
+    res.json({ message: "Password has been reset" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };

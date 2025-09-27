@@ -30,6 +30,15 @@ function App() {
               element={<StudentRequestDetails />}
             />
             <Route path="/student/request" element={<RequestOutpass />} />
+            <Route
+              path="/StudentForgotPassword"
+              element={<StudentForgotPassword />}
+            />
+            <Route
+              path="/WardenForgotPassword"
+              element={<WardenForgotPassword />}
+            />
+            <Route path="/reset-password" element={<ResetPassword />} />
           </Routes>
         </Router>
       </RequestProvider>
