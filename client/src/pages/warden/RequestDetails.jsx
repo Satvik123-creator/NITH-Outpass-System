@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import { getOutpassById, updateOutpass } from "../../api/wardenAPI";
@@ -10,11 +10,14 @@ export default function RequestDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { token } = useAuth();
-  const [loading, setLoading] = useState(true);
-  const [outpass, setOutpass] = useState(null);
+  const location = useLocation();
+  const [loading, setLoading] = useState(false);
+  const [outpass, setOutpass] = useState(location.state?.outpass || null);
 
   useEffect(() => {
     if (!id) return;
+    // if we already have the outpass from navigation state and it includes student.email, no need to fetch
+    if (outpass && outpass.student && outpass.student.email) return;
     const fetch = async () => {
       try {
         setLoading(true);
@@ -40,8 +43,8 @@ export default function RequestDetails() {
     }
   };
 
-  if (loading) return <div className="p-6">Loading...</div>;
-  if (!outpass) return <div className="p-6">Outpass not found</div>;
+  // Render page shell immediately; show message inside if not found / loading
+  if (!outpass && !loading) return <div className="p-6">Outpass not found</div>;
 
   const fmt = (d) => {
     try {

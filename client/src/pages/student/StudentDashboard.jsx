@@ -112,12 +112,18 @@ export default function StudentDashboard() {
                     {previous.map((r) => (
                       <li
                         key={r._id}
-                        onClick={() => navigate(`/student/outpass/${r._id}`)}
+                        onClick={() =>
+                          navigate(`/student/outpass/${r._id}`, {
+                            state: { outpass: r },
+                          })
+                        }
                         role="button"
                         tabIndex={0}
                         onKeyDown={(e) => {
                           if (e.key === "Enter")
-                            navigate(`/student/outpass/${r._id}`);
+                            navigate(`/student/outpass/${r._id}`, {
+                              state: { outpass: r },
+                            });
                         }}
                         className="cursor-pointer group bg-white hover:bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center justify-between gap-4 transition focus:outline-none focus:ring-2 focus:ring-blue-200"
                       >

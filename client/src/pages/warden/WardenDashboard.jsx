@@ -94,7 +94,11 @@ export default function WardenDashboard() {
 
                         <div className="flex items-center gap-3 mt-3 sm:mt-0">
                           <button
-                            onClick={() => navigate(`/warden/request/${r._id}`)}
+                            onClick={() =>
+                              navigate(`/warden/request/${r._id}`, {
+                                state: { outpass: r },
+                              })
+                            }
                             className="btn btn-md btn-blue"
                           >
                             View
@@ -154,7 +158,11 @@ export default function WardenDashboard() {
                         </div>
                         <div className="flex items-center gap-3">
                           <button
-                            onClick={() => navigate(`/warden/request/${r._id}`)}
+                            onClick={() =>
+                              navigate(`/warden/request/${r._id}`, {
+                                state: { outpass: r },
+                              })
+                            }
                             className="btn btn-sm btn-blue"
                           >
                             View
