@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function StudentNavbar() {
+export default function Navbar() {
   const { authUser, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -12,28 +12,37 @@ export default function StudentNavbar() {
   };
 
   return (
-    <nav className="bg-[#071133] text-white shadow-md">
-      <div className="container mx-auto flex items-center justify-between p-4">
+    <nav className="bg-[#071133] text-white shadow-md w-full py-4">
+      <div className="flex items-center justify-between px-6 sm:px-8 lg:px-24 w-full">
         <Link to="/" className="flex items-center gap-3">
           <img
             src="/nith_logo.jpg"
             alt="NITH"
-            className="w-10 h-10 rounded-md"
+            className="w-12 h-12 rounded-md"
           />
           <div>
-            <div className="text-lg font-semibold">NITH Outpass</div>
-            <div className="text-sm muted">Student & Warden Portal</div>
+            <div className="text-xl md:text-2xl font-semibold">
+              NITH Outpass
+            </div>
+            <div className="text-sm md:text-base muted">
+              Student & Warden Portal
+            </div>
           </div>
         </Link>
 
         <div className="flex items-center gap-4">
           {authUser ? (
             <>
-              <div className="text-sm">
-                <div className="font-medium">{authUser.name}</div>
-                <div className="text-xs muted">{authUser.role}</div>
+              <div className="text-base mr-4">
+                <div className="font-medium truncate max-w-xs">
+                  {authUser.name}
+                </div>
               </div>
-              <button onClick={handleLogout} className="btn btn-sm btn-accent">
+              <button
+                onClick={handleLogout}
+                className="btn btn-md btn-accent"
+                aria-label="Logout"
+              >
                 Logout
               </button>
             </>
