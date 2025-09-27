@@ -11,6 +11,10 @@ import WardenDashboard from "./pages/warden/WardenDashboard";
 import RequestOutpass from "./pages/student/RequestOutpass";
 import RequestDetails from "./pages/warden/RequestDetails";
 import StudentRequestDetails from "./pages/student/StudentRequestDetails";
+import StudentForgotPassword from "./pages/auth/StudentForgotPassword";
+import WardenForgotPassword from "./pages/auth/WardenForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+
 
 import "./App.css"; // Tailwind CSS import
 function App() {
