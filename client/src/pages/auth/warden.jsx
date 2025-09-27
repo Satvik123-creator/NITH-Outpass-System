@@ -4,7 +4,8 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
-import AuthCard from "../../components/AuthCard";
+import Navbar from "../../components/Navbar";
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 const Warden = () => {
@@ -17,8 +18,8 @@ const Warden = () => {
   const [password, setPassword] = useState("");
   const [hostelName, setHostelName] = useState("");
   const [otp, setOtp] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false); // waiting for OTP
-  const [showRegister, setShowRegister] = useState(false); // toggle register
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
 
   const hostelOptions = [
@@ -88,27 +89,31 @@ const Warden = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-900 text-white px-4">
-      <div className="text-center mb-6">
-        <img
-          src="/nith_logo.jpg"
-          alt="NITH logo"
-          className="mx-auto w-28 mb-4"
-        />
-        <h1 className="text-3xl font-bold">NITH Outpass Portal</h1>
-        <h2 className="text-lg text-gray-300">
-          Please login using your webkiosk credentials
-        </h2>
-      </div>
+    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+      <Navbar />
 
-      <AuthCard>
-        <div className="w-full max-w-md bg-gray-800 rounded-xl shadow-lg p-6">
+      <main className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="bg-white border border-gray-100 rounded-2xl shadow p-6">
+          <div className="text-center mb-4">
+            <img
+              src="/nith_logo.jpg"
+              alt="NITH logo"
+              className="mx-auto w-20 mb-3"
+            />
+            <h1 className="text-2xl font-semibold text-gray-900">
+              NITH Outpass Portal
+            </h1>
+            <p className="text-sm text-gray-500">
+              Please login using your webkiosk credentials
+            </p>
+          </div>
+
           {isSubmitted ? (
             <div>
               <h2 className="text-xl font-semibold mb-4 text-center">
                 Email Verification
               </h2>
-              <p className="text-sm text-gray-300 mb-3 text-center">
+              <p className="text-sm text-gray-600 mb-3 text-center">
                 Please check your email id and enter the OTP
               </p>
               <form
@@ -119,7 +124,7 @@ const Warden = () => {
                   type="number"
                   name="otp"
                   placeholder="Enter the OTP"
-                  className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   required
@@ -141,8 +146,10 @@ const Warden = () => {
           ) : (
             <>
               {!showRegister ? (
-                <div className="mb-8">
-                  <p className="text-sm mb-3">Already Registered? Login Now</p>
+                <div className="mb-6">
+                  <p className="text-sm mb-3 text-gray-600">
+                    Already Registered? Login Now
+                  </p>
                   <form
                     onSubmit={handleWardenLogin}
                     className="flex flex-col gap-4"
@@ -150,7 +157,7 @@ const Warden = () => {
                     <input
                       type="text"
                       placeholder="Employee Number"
-                      className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={(e) =>
                         setEmployee(e.target.value.toUpperCase())
                       }
@@ -159,7 +166,7 @@ const Warden = () => {
                     <input
                       type="password"
                       placeholder="Password"
-                      className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -172,13 +179,13 @@ const Warden = () => {
                   </form>
                   <div className="mt-3 flex justify-between items-center">
                     <button
-                      className="text-blue-400 hover:underline text-sm"
+                      className="text-blue-600 hover:underline text-sm"
                       onClick={() => setShowRegister(true)}
                     >
                       Don't have an account? Sign up
                     </button>
                     <button
-                      className="text-blue-400 hover:underline text-sm"
+                      className="text-blue-600 hover:underline text-sm"
                       onClick={() => navigate("/WardenForgotPassword")}
                     >
                       Forgot Password?
@@ -187,7 +194,9 @@ const Warden = () => {
                 </div>
               ) : (
                 <div>
-                  <p className="text-sm mb-3">Create a warden account</p>
+                  <p className="text-sm mb-3 text-gray-600">
+                    Create a warden account
+                  </p>
                   <form
                     className="flex flex-col gap-4"
                     onSubmit={handleWardenRegister}
@@ -195,14 +204,14 @@ const Warden = () => {
                     <input
                       type="text"
                       placeholder="Full Name"
-                      className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={(e) => setName(e.target.value.toUpperCase())}
                       required
                     />
                     <input
                       type="text"
                       placeholder="Employee Number"
-                      className="w-full p-2 rounded-md bg-gray-700 text-white uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={(e) =>
                         setEmployee(e.target.value.toUpperCase())
                       }
@@ -211,14 +220,14 @@ const Warden = () => {
                     <input
                       type="email"
                       placeholder="Email Address (@nith.ac.in)"
-                      className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={(e) => setEmail(e.target.value)}
                       required
                     />
                     <input
                       type="password"
                       placeholder="Password"
-                      className="w-full p-2 rounded-md bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
                       onChange={(e) => setPassword(e.target.value)}
                       required
                     />
@@ -252,7 +261,7 @@ const Warden = () => {
             </>
           )}
         </div>
-      </AuthCard>
+      </main>
     </div>
   );
 };
