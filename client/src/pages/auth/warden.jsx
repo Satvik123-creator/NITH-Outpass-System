@@ -4,7 +4,7 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
-import Navbar from "../../components/Navbar";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -90,7 +90,7 @@ const Warden = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      <Navbar />
+     
 
       <main className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="bg-white border border-gray-100 rounded-2xl shadow p-6">
