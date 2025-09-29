@@ -1,45 +1,35 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-export default function Home() {
 
+export default function Home() {
   const navigate = useNavigate();
 
-  const handleWardenClick = () => {
-    navigate("/login/warden");
-  };
-  const handleStudentClick = () => {
-    navigate("/login/student");
-  };  
+  const handleWardenClick = () => navigate("/login/warden");
+  const handleStudentClick = () => navigate("/login/student");
+
   return (
-   <div className="relative min-h-screen flex items-center justify-center bg-gray-100">
-  {/* Background Image */}
-  <div
-    className="absolute inset-0 bg-cover bg-center opacity-30"
-    style={{ backgroundImage: "url('/nith_bg-img.jpg')" }}
-  ></div>
-
+   <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-50 via-blue-100 to-blue-200">
   {/* Main Content */}
-  <div className="relative z-10 text-center p-6 bg-white/70 rounded-lg shadow-lg max-w-lg">
-    <h1 className="text-3xl font-bold mb-4 text-gray-800">WELCOME TO NITH OUT PASS PORTAL</h1>
-    <h2 className="text-xl font-semibold mb-6 text-gray-700">Who are you?</h2>
+  <div className="relative z-10 text-center p-8 bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl max-w-lg w-11/12">
+    <h1 className="text-3xl md:text-4xl font-extrabold mb-4 text-gray-900">
+      WELCOME TO NITH OUTPASS PORTAL
+    </h1>
+    <h2 className="text-lg md:text-xl font-medium mb-8 text-gray-700">
+      Who are you?
+    </h2>
 
-    <div className="flex justify-center gap-8">
-      {/* Warden */}
+    <div className="flex flex-col md:flex-row justify-center gap-6">
       <div
-        className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition duration-300"
         onClick={handleWardenClick}
+        className="w-full md:w-40 px-6 py-4 bg-blue-600 text-white rounded-lg shadow-md cursor-pointer hover:scale-105 hover:shadow-lg transform transition duration-300"
       >
-        {/* <FontAwesomeIcon icon={faUser} size="3x" className="text-gray-800" /> */}
-        <p className="mt-2 font-medium text-gray-700">WARDEN</p>
+        <p className="font-semibold">WARDEN</p>
       </div>
-
-      {/* Student */}
       <div
-        className="flex flex-col items-center cursor-pointer hover:scale-105 transform transition duration-300"
         onClick={handleStudentClick}
+        className="w-full md:w-40 px-6 py-4 bg-green-600 text-white rounded-lg shadow-md cursor-pointer hover:scale-105 hover:shadow-lg transform transition duration-300"
       >
-        {/* <FontAwesomeIcon icon={faUser} size="3x" className="text-gray-800" /> */}
-        <p className="mt-2 font-medium text-gray-700">STUDENT</p>
+        <p className="font-semibold">STUDENT</p>
       </div>
     </div>
   </div>
