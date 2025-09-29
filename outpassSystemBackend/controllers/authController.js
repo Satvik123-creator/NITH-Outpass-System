@@ -186,29 +186,44 @@ export const sendOtp = async (req, res) => {
   otpStore[email] = otp;
   console.log("OTP generated for", email, ":", otp);
 
-  // Nodemailer setup (Gmail example)
+  // Nodemailer setup (configurable via env)
+  const mailHost = process.env.EMAIL_HOST || "smtp.gmail.com";
+  const mailPort = process.env.EMAIL_PORT
+    ? Number(process.env.EMAIL_PORT)
+    : 587;
+  const mailSecure = process.env.EMAIL_SECURE === "true" || mailPort === 465;
+
   const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587, // TLS port (works better if 465 is blocked)
-    secure: false, // use TLS
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS, // 16-character App Password
-    },
+    host: mailHost,
+    port: mailPort,
+    secure: mailSecure,
+    auth: process.env.EMAIL_USER
+      ? { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+      : undefined,
   });
 
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.EMAIL_USER || `no-reply@${mailHost}`,
     to: email,
     subject: "OTP for NITH Outpass Portal",
     text: `Your OTP is ${otp}. It is valid for 10 minutes.`,
   };
 
+  // If dev fallback is enabled, return OTP in response instead of sending email
+  if (process.env.DEV_EMAIL_FALLBACK === "true") {
+    console.log("DEV_EMAIL_FALLBACK enabled - returning OTP in response");
+    return res.status(200).json({ message: "OTP (dev)", otp });
+  }
+
   try {
     await transporter.sendMail(mailOptions);
     res.status(200).json({ message: "OTP sent successfully" });
   } catch (err) {
-    console.error(err);
+    console.error("Failed to send OTP: ", err);
+    // If fallback enabled, return OTP for local testing
+    if (process.env.DEV_EMAIL_FALLBACK === "true") {
+      return res.status(200).json({ message: "OTP (dev)", otp });
+    }
     res.status(500).json({ message: "Failed to send OTP" });
   }
 };
@@ -245,24 +260,44 @@ export const forgotPassword = async (req, res) => {
       process.env.FRONTEND_URL || "http://localhost:3000"
     }/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
+    const mailHost = process.env.EMAIL_HOST || "smtp.gmail.com";
+    const mailPort = process.env.EMAIL_PORT
+      ? Number(process.env.EMAIL_PORT)
+      : 587;
+    const mailSecure = process.env.EMAIL_SECURE === "true" || mailPort === 465;
+
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+      host: mailHost,
+      port: mailPort,
+      secure: mailSecure,
+      auth: process.env.EMAIL_USER
+        ? { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+        : undefined,
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: process.env.EMAIL_USER || `no-reply@${mailHost}`,
       to: email,
       subject: "Password Reset - NITH Outpass Portal",
       text: `You requested a password reset. Click the link to reset your password: ${resetUrl} \nThis link is valid for 1 hour.`,
     };
 
+    // If dev fallback is enabled, return resetUrl in response for testing
+    if (process.env.DEV_EMAIL_FALLBACK === "true") {
+      console.log(
+        "DEV_EMAIL_FALLBACK enabled - returning reset URL in response"
+      );
+      return res.json({ message: "Password reset (dev)", resetUrl });
+    }
+
     await transporter.sendMail(mailOptions);
     res.json({ message: "Password reset email sent" });
   } catch (err) {
     console.error(err);
+    console.error("Password reset send failed:", err);
+    if (process.env.DEV_EMAIL_FALLBACK === "true") {
+      return res.json({ message: "Password reset (dev)", resetUrl });
+    }
     res.status(500).json({ message: "Server error" });
   }
 };

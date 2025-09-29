@@ -179,13 +179,13 @@ const Student = () => {
                   </form>
                   <div className="mt-3 flex justify-between items-center">
                     <button
-                      className="text-blue-600 hover:underline text-sm"
+                      className="text-blue-600 hover:underline text-sm cursor-pointer"
                       onClick={() => setShowRegister(true)}
                     >
                       Don't have an account? Sign up
                     </button>
                     <button
-                      className="text-blue-600 hover:underline text-sm"
+                      className="text-blue-600 hover:underline text-sm cursor-pointer"
                       onClick={() => navigate("/StudentForgotPassword")}
                     >
                       Forgot Password?
