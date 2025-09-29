@@ -44,11 +44,15 @@ export default function OutpassForm() {
   };
 
   return (
-    <div
-      className=" min-h-screen flex items-center justify-center bg-cover bg-center p-6"
-      style={{ backgroundImage: "url('/nith_bg-img.jpg')" }}
-    >
-      <div className="w-full max-w-5xl">
+    <div className="relative min-h-screen flex items-center justify-center p-6">
+      {/* Background Image */}
+      <img
+        src="/nith_bg-img.jpg"
+        alt="NITH Background"
+        className="absolute inset-0 w-full h-full object-cover z-0 "
+      />
+     <div className="absolute inset-0 bg-black/25 z-5"></div> 
+      <div className="w-full max-w-5xl relative z-10">
         <form
           onSubmit={handleSubmit}
           className="backdrop-blur-sm bg-white/20 border border-white/70 rounded-2xl p-8 shadow-lg"
@@ -93,7 +97,7 @@ export default function OutpassForm() {
                 value={room}
                 onChange={(e) => setRoom(e.target.value)}
                 className="w-full bg-transparent border-b border-white/60 text-white placeholder-white/60 py-2 outline-none"
-                placeholder="B-315"
+                placeholder="Room No"
               />
             </div>
           </div>
@@ -169,13 +173,9 @@ export default function OutpassForm() {
             <div className="text-sm text-white/80">
               <div>
                 Submitted as:{" "}
-                <span className="font-medium">
-                  {authUser?.name || "Student"}
-                </span>
+                <span className="font-medium">{authUser?.name || "Student"}</span>
               </div>
-              <div className="text-xs mt-1">
-                Status will be visible in your dashboard
-              </div>
+              <div className="text-xs mt-1">Status will be visible in your dashboard</div>
             </div>
           </div>
         </form>
