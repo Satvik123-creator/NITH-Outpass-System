@@ -44,7 +44,7 @@ export default function OutpassForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-white p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0b5fff] to-[#071133] p-6">
       <div className="max-w-3xl w-full px-4 sm:px-6 lg:px-8">
         <div className="bg-white border border-gray-100 rounded-2xl shadow p-6 md:p-10">
           <div className="text-center mb-6">
