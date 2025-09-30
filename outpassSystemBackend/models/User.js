@@ -11,6 +11,14 @@ const userSchema = new mongoose.Schema({
   // Brute-force protection fields
   failedLoginAttempts: { type: Number, default: 0 },
   lockUntil: { type: Date },
+  // Refresh tokens stored as hashed values to allow revoke/rotation
+  refreshTokens: [
+    {
+      token: { type: String }, // sha256 of the refresh token
+      createdAt: { type: Date, default: Date.now },
+      expiresAt: { type: Date },
+    },
+  ],
   // Fields to support password reset flow
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },

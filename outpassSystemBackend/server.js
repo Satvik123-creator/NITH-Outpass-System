@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import helmet from "helmet";
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import cookieParser from "cookie-parser";
 import studentRoutes from "./routes/studentRoutes.js";
 import wardenRoutes from "./routes/wardenRoutes.js";
 import { generalLimiter } from "./middlewares/rateLimiter.js";
@@ -22,6 +23,8 @@ app.use(
   })
 );
 app.use(express.json());
+// parse cookies for refresh token handling
+app.use(cookieParser());
 // apply a general rate limiter to all requests
 app.use(generalLimiter);
 // Harden HTTP headers

@@ -48,4 +48,10 @@ router.post(
   resetPassword
 );
 
+// Refresh access token
+import { refreshToken, logout } from "../controllers/authController.js";
+
+router.post("/refresh-token", refreshToken);
+router.post("/logout", logout);
+
 export default router;

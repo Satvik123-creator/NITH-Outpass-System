@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
+import cryptoLib from "crypto";
+import User from "../models/User.js";
 // ================= Signup =================
 export const signup = async (req, res) => {
   try {
@@ -139,11 +141,9 @@ export const login = async (req, res) => {
     // check if account is locked
     if (user.lockUntil && user.lockUntil > Date.now()) {
       const waitSeconds = Math.ceil((user.lockUntil - Date.now()) / 1000);
-      return res
-        .status(423)
-        .json({
-          message: `Account locked. Try again in ${waitSeconds} seconds`,
-        });
+      return res.status(423).json({
+        message: `Account locked. Try again in ${waitSeconds} seconds`,
+      });
     }
 
     // compare passwords
@@ -175,17 +175,43 @@ export const login = async (req, res) => {
       await user.save();
     }
 
-    // generate token
-    const token = jwt.sign(
+    // generate short-lived access token and refresh token
+    const accessToken = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "15m" }
     );
 
+    // create refresh token (secure random) and store hashed version
+    const refreshTokenPlain = cryptoLib.randomBytes(64).toString("hex");
+    const refreshTokenHash = cryptoLib
+      .createHash("sha256")
+      .update(refreshTokenPlain)
+      .digest("hex");
+    const refreshExpiresDays = Number(process.env.REFRESH_TOKEN_DAYS) || 30;
+    const refreshExpiresAt =
+      Date.now() + refreshExpiresDays * 24 * 60 * 60 * 1000;
+
+    user.refreshTokens = user.refreshTokens || [];
+    user.refreshTokens.push({
+      token: refreshTokenHash,
+      expiresAt: refreshExpiresAt,
+    });
+    // keep only last 10 tokens
+    if (user.refreshTokens.length > 10) user.refreshTokens.shift();
+    await user.save();
+
+    // Set HttpOnly cookie for refresh token (secure flag depends on env)
+    const isProd = process.env.NODE_ENV === "production";
+    res.cookie("refreshToken", refreshTokenPlain, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "strict" : "lax",
+      expires: new Date(refreshExpiresAt),
+    });
+
     res.json({
-      token,
+      accessToken,
       user: {
         id: user._id,
         name: user.name,
@@ -198,6 +224,90 @@ export const login = async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Refresh token endpoint - rotates refresh token
+export const refreshToken = async (req, res) => {
+  try {
+    const tokenFromCookie = req.cookies?.refreshToken || req.body?.refreshToken;
+    if (!tokenFromCookie)
+      return res.status(401).json({ message: "No refresh token" });
+
+    const tokenHash = cryptoLib
+      .createHash("sha256")
+      .update(tokenFromCookie)
+      .digest("hex");
+    const user = await User.findOne({ "refreshTokens.token": tokenHash });
+    if (!user)
+      return res.status(401).json({ message: "Invalid refresh token" });
+
+    // find the stored token entry
+    const stored = user.refreshTokens.find((r) => r.token === tokenHash);
+    if (!stored || stored.expiresAt < Date.now()) {
+      return res.status(401).json({ message: "Refresh token expired" });
+    }
+
+    // rotate: remove used token and issue a new one
+    user.refreshTokens = user.refreshTokens.filter(
+      (r) => r.token !== tokenHash
+    );
+    const newRefreshPlain = cryptoLib.randomBytes(64).toString("hex");
+    const newRefreshHash = cryptoLib
+      .createHash("sha256")
+      .update(newRefreshPlain)
+      .digest("hex");
+    const refreshExpiresDays = Number(process.env.REFRESH_TOKEN_DAYS) || 30;
+    const newExpiresAt = Date.now() + refreshExpiresDays * 24 * 60 * 60 * 1000;
+    user.refreshTokens.push({ token: newRefreshHash, expiresAt: newExpiresAt });
+    if (user.refreshTokens.length > 10) user.refreshTokens.shift();
+    await user.save();
+
+    // issue new access token
+    const accessToken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "15m" }
+    );
+
+    const isProd = process.env.NODE_ENV === "production";
+    res.cookie("refreshToken", newRefreshPlain, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "strict" : "lax",
+      expires: new Date(newExpiresAt),
+    });
+
+    res.json({ accessToken });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Logout - revoke the refresh token
+export const logout = async (req, res) => {
+  try {
+    const tokenFromCookie = req.cookies?.refreshToken || req.body?.refreshToken;
+    if (tokenFromCookie) {
+      const tokenHash = cryptoLib
+        .createHash("sha256")
+        .update(tokenFromCookie)
+        .digest("hex");
+      const user = await User.findOne({ "refreshTokens.token": tokenHash });
+      if (user) {
+        user.refreshTokens = user.refreshTokens.filter(
+          (r) => r.token !== tokenHash
+        );
+        await user.save();
+      }
+    }
+    // clear cookie
+    res.clearCookie("refreshToken");
+    res.json({ message: "Logged out" });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };
