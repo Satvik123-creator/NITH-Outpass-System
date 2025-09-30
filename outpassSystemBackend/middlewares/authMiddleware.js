@@ -10,10 +10,14 @@ export const protect = async (req, res, next) => {
     req.headers.authorization.startsWith("Bearer")
   ) {
     try {
+      // DEBUG: log presence of Authorization header (dev only)
+      console.debug("[protect] Authorization header present");
       token = req.headers.authorization.split(" ")[1]?.trim();
 
       if (!token) {
-        return res.status(401).json({ message: "Not authorized, token missing" });
+        return res
+          .status(401)
+          .json({ message: "Not authorized, token missing" });
       }
 
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -39,7 +43,9 @@ export const authorizeRoles = (...roles) => {
     if (!roles.includes(req.user.role)) {
       return res
         .status(403)
-        .json({ message: "You do not have permission to access this resource" });
+        .json({
+          message: "You do not have permission to access this resource",
+        });
     }
     next();
   };

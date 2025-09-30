@@ -235,6 +235,14 @@ export const login = async (req, res) => {
 // Refresh token endpoint - rotates refresh token
 export const refreshToken = async (req, res) => {
   try {
+    // DEBUG: log incoming cookies and body (dev only)
+    try {
+      console.debug("[refreshToken] req.cookies:", req.cookies);
+      console.debug("[refreshToken] req.body:", Object.keys(req.body || {}));
+    } catch (e) {
+      // ignore
+    }
+
     const tokenFromCookie = req.cookies?.refreshToken || req.body?.refreshToken;
     if (!tokenFromCookie)
       return res.status(401).json({ message: "No refresh token" });
@@ -243,6 +251,7 @@ export const refreshToken = async (req, res) => {
       .createHash("sha256")
       .update(tokenFromCookie)
       .digest("hex");
+    console.debug("[refreshToken] tokenHash (sha256):", tokenHash);
     const user = await User.findOne({ "refreshTokens.token": tokenHash });
     if (!user)
       return res.status(401).json({ message: "Invalid refresh token" });

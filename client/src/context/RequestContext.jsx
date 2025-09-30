@@ -26,8 +26,12 @@ export const RequestProvider = ({ children }) => {
       const outpasses = res?.data || res;
       setRequests(outpasses || []);
     } catch (err) {
-      console.error("Fetch error:", err);
-      toast.error(err?.response?.data?.message || "Failed to fetch outpasses");
+      // show a user-friendly toast but avoid noisy console stack in dev
+      const msg =
+        err?.response?.data?.message ||
+        err.message ||
+        "Failed to fetch outpasses";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -42,8 +46,11 @@ export const RequestProvider = ({ children }) => {
       setRequests((prev) => [newOutpass, ...prev]); // Add newly created outpass
       return newOutpass;
     } catch (err) {
-      console.error("Request error:", err);
-      toast.error(err?.response?.data?.message || "Failed to request outpass");
+      const msg =
+        err?.response?.data?.message ||
+        err.message ||
+        "Failed to request outpass";
+      toast.error(msg);
     } finally {
       setLoading(false);
     }

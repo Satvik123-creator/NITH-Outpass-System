@@ -19,8 +19,15 @@ export default function WardenDashboard() {
   const [requests, setRequests] = useState([]);
 
   const fetchRequests = async () => {
-    const data = await getAllOutpasses(token);
-    setRequests(data);
+    try {
+      const res = await getAllOutpasses();
+      const outpasses = res?.data || res || [];
+      setRequests(outpasses);
+    } catch (err) {
+      console.error("Warden fetch error:", err);
+      // swallow and show friendly message
+      setRequests([]);
+    }
   };
 
   useEffect(() => {

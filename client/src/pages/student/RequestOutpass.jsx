@@ -40,11 +40,18 @@ export default function OutpassForm() {
     } catch (err) {
       console.error(err);
       toast.error("Something went wrong while applying.");
-    }
+    }cls
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0b5fff] to-[#071133] p-6">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0b5fff] to-[#071133] p-6 relative">
+      {/* centered logo overlapping the gradient */}
+      <img
+        src="/nith_logo.jpg"
+        alt="NITH Logo"
+        className="absolute left-4 top-4 w-12 md:w-20 lg:w-28 h-12 md:h-20 lg:h-28 rounded-full border-4 border-white shadow-lg z-20"
+      />
+
       <div className="max-w-3xl w-full px-4 sm:px-6 lg:px-8">
         <div className="bg-white border border-gray-100 rounded-2xl shadow p-6 md:p-10">
           <div className="text-center mb-6">

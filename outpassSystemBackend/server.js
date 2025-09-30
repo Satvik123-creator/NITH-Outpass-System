@@ -15,6 +15,7 @@ dotenv.config();
 
 const app = express();
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:5173";
+console.debug("Starting server with FRONTEND_URL:", FRONTEND_ORIGIN);
 // Sentry was removed from this project; logging remains enabled
 app.use(
   cors({
@@ -51,6 +52,11 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/outpass", studentRoutes); // New route for outpass
 app.use("/api/outpasses", wardenRoutes); // New route for outpass
+
+// Lightweight health-check endpoint for local debugging
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", time: new Date().toISOString() });
+});
 await connectDB();
 
 const PORT = process.env.PORT || 5000;
