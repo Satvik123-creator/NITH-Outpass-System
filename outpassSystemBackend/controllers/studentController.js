@@ -32,10 +32,19 @@ export const createOutpass = async (req, res) => {
 // ================= Get All Outpasses (History) =================
 export const getStudentOutpasses = async (req, res) => {
   try {
-    const outpasses = await Outpass.find({ student: req.user._id }).sort({
-      createdAt: -1,
-    });
-    res.json(outpasses);
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Number(req.query.limit) || 20, 100);
+    const skip = (page - 1) * limit;
+
+    const [outpasses, total] = await Promise.all([
+      Outpass.find({ student: req.user._id })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Outpass.countDocuments({ student: req.user._id }),
+    ]);
+
+    res.json({ data: outpasses, page, limit, total });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -44,12 +53,19 @@ export const getStudentOutpasses = async (req, res) => {
 // ================= Get Pending Outpasses (for student) =================
 export const getPendingOutpasses = async (req, res) => {
   try {
-    const pendingOutpasses = await Outpass.find({
-      student: req.user._id,
-      status: "pending",
-    }).sort({ createdAt: -1 });
+    const page = Math.max(Number(req.query.page) || 1, 1);
+    const limit = Math.min(Number(req.query.limit) || 20, 100);
+    const skip = (page - 1) * limit;
 
-    res.json(pendingOutpasses);
+    const [pendingOutpasses, total] = await Promise.all([
+      Outpass.find({ student: req.user._id, status: "pending" })
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Outpass.countDocuments({ student: req.user._id, status: "pending" }),
+    ]);
+
+    res.json({ data: pendingOutpasses, page, limit, total });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

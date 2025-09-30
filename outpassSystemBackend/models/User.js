@@ -24,4 +24,10 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpires: { type: Date },
 });
 
+// Indexes for uniqueness and performance
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ enrollmentNo: 1 }, { unique: true, sparse: true });
+userSchema.index({ employeeNo: 1 }, { unique: true, sparse: true });
+userSchema.index({ hostelName: 1 });
+
 export default mongoose.model("User", userSchema);
