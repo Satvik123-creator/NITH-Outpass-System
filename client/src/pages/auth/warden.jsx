@@ -40,7 +40,20 @@ const Warden = () => {
   const handleWardenLogin = async (e) => {
     e.preventDefault();
     try {
-      await login({ employeeNo: employee, password, role: "warden" });
+      const user = await login({
+        employeeNo: employee,
+        password,
+        role: "warden",
+      });
+
+      // Defensive check: ensure the returned user is actually a warden
+      if (!user || user.role !== "warden") {
+        toast.error(
+          "You do not have permission to access the warden dashboard"
+        );
+        return;
+      }
+
       toast.success("Login successful");
       navigate("/warden/dashboard");
     } catch (error) {

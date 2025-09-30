@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 import { getAllOutpasses, updateOutpass } from "../../api/wardenAPI";
 import { useNavigate } from "react-router-dom";
 import StatusBadge from "../../components/StatusBadge";
@@ -14,7 +15,7 @@ function formatDateTime(dt) {
 }
 
 export default function WardenDashboard() {
-  const { token } = useAuth();
+  const { token, authUser } = useAuth();
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
 
@@ -31,8 +32,22 @@ export default function WardenDashboard() {
   };
 
   useEffect(() => {
-    if (token) fetchRequests();
-  }, [token]);
+    // Wait until auth state is ready. If there's no token or user, don't fetch.
+    if (!token) return;
+    if (!authUser) {
+      // auth still initializing; do nothing yet
+      return;
+    }
+
+    // Defensive: if user is not a warden, show message and redirect
+    if (authUser.role !== "warden") {
+      toast.error("You do not have permission to access the warden dashboard");
+      navigate("/");
+      return;
+    }
+
+    fetchRequests();
+  }, [token, authUser]);
 
   const handleUpdate = async (id, status) => {
     await updateOutpass(id, status, token);
@@ -170,7 +185,7 @@ export default function WardenDashboard() {
                                 state: { outpass: r },
                               })
                             }
-                            className="btn btn-sm btn-blue"
+                            className="btn btn-md btn-blue"
                           >
                             View
                           </button>
@@ -201,7 +216,7 @@ export default function WardenDashboard() {
                 <div className="mt-2 flex flex-col gap-2">
                   <button
                     onClick={fetchRequests}
-                    className="btn btn-sm btn-neutral"
+                    className="btn btn-md btn-neutral"
                   >
                     Refresh
                   </button>

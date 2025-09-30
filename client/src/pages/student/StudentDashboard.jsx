@@ -137,20 +137,16 @@ export default function StudentDashboard() {
                         </div>
                         <div className="flex items-center gap-3">
                           <StatusBadge status={r.status} />
-                          <svg
-                            className="w-5 h-5 text-gray-400 group-hover:text-gray-600"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
+                          <button
+                            onClick={() =>
+                              navigate(`/student/outpass/${r._id}`, {
+                                state: { outpass: r },
+                              })
+                            }
+                            className="btn btn-md btn-blue"
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            ></path>
-                          </svg>
+                            View
+                          </button>
                         </div>
                       </li>
                     ))}

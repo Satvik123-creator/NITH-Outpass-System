@@ -51,12 +51,12 @@ export default function OutpassForm() {
 
       <div className="min-h-screen flex items-center justify-center p-6 relative">
         <div className="max-w-5xl w-full px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 border border-gray-200 rounded-2xl shadow p-6 md:p-10">
+          <div className="bg-gradient-to-br from-blue-100 via-blue-150 to-blue-300 border border-gray-200 rounded-2xl shadow p-6 md:p-10">
             <div className="text-center mb-6">
               <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
                 Apply for Outpass
               </h1>
-              <p className="text-sm md:text-base text-gray-600 max-w-xl mx-auto leading-relaxed mt-2">
+              <p className="text-sm md:text-base font-medium text-gray-900 max-w-xl mx-auto leading-relaxed mt-2">
                 Fill the form below to request an outpass. Provide accurate
                 dates and a short purpose so your request can be processed
                 quickly.

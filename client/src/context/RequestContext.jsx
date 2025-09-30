@@ -12,7 +12,7 @@ const RequestContext = createContext({
 });
 
 export const RequestProvider = ({ children }) => {
-  const { token } = useAuth();
+  const { token, authUser } = useAuth();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -56,11 +56,15 @@ export const RequestProvider = ({ children }) => {
     }
   };
 
-  // Automatically fetch requests when token changes (or on mount)
+  // Automatically fetch requests when token or authUser changes (or on mount)
+  // Only fetch when we have a logged-in student to avoid unauthorized calls
   useEffect(() => {
+    if (!token) return; // no auth -> nothing to fetch
+    if (!authUser) return; // wait until auth state is ready
+    if (authUser.role !== "student") return; // only students should call this endpoint
     fetchRequests();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [token]);
+  }, [token, authUser]);
 
   return (
     <RequestContext.Provider
