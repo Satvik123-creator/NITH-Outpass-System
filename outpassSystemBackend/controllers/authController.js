@@ -3,8 +3,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import nodemailer from "nodemailer";
 import crypto from "crypto";
-import cryptoLib from "crypto";
-import User from "../models/User.js";
 // ================= Signup =================
 export const signup = async (req, res) => {
   try {
@@ -183,8 +181,8 @@ export const login = async (req, res) => {
     );
 
     // create refresh token (secure random) and store hashed version
-    const refreshTokenPlain = cryptoLib.randomBytes(64).toString("hex");
-    const refreshTokenHash = cryptoLib
+    const refreshTokenPlain = crypto.randomBytes(64).toString("hex");
+    const refreshTokenHash = crypto
       .createHash("sha256")
       .update(refreshTokenPlain)
       .digest("hex");
@@ -235,7 +233,7 @@ export const refreshToken = async (req, res) => {
     if (!tokenFromCookie)
       return res.status(401).json({ message: "No refresh token" });
 
-    const tokenHash = cryptoLib
+    const tokenHash = crypto
       .createHash("sha256")
       .update(tokenFromCookie)
       .digest("hex");
@@ -253,8 +251,8 @@ export const refreshToken = async (req, res) => {
     user.refreshTokens = user.refreshTokens.filter(
       (r) => r.token !== tokenHash
     );
-    const newRefreshPlain = cryptoLib.randomBytes(64).toString("hex");
-    const newRefreshHash = cryptoLib
+    const newRefreshPlain = crypto.randomBytes(64).toString("hex");
+    const newRefreshHash = crypto
       .createHash("sha256")
       .update(newRefreshPlain)
       .digest("hex");
@@ -291,7 +289,7 @@ export const logout = async (req, res) => {
   try {
     const tokenFromCookie = req.cookies?.refreshToken || req.body?.refreshToken;
     if (tokenFromCookie) {
-      const tokenHash = cryptoLib
+      const tokenHash = crypto
         .createHash("sha256")
         .update(tokenFromCookie)
         .digest("hex");
