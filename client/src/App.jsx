@@ -15,12 +15,26 @@ import StudentForgotPassword from "./pages/auth/StudentForgotPassword";
 import WardenForgotPassword from "./pages/auth/WardenForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 
-
 import "./App.css"; // Tailwind CSS import
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 function App() {
   return (
     <AuthProvider>
       <RequestProvider>
+        {/* ToastContainer must be included once at app root to render toasts */}
+        <ToastContainer
+          position="top-right"
+          autoClose={4000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="colored"
+        />
         <Router>
           <Routes>
             <Route path="/" element={<Home />} />

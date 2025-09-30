@@ -18,7 +18,7 @@ export default function Navbar() {
           <img
             src="/nith_logo.jpg"
             alt="NITH"
-            className="w-12 h-12 rounded-md"
+            className="w-12 h-12 rounded-full"
           />
           <div>
             <div className="text-xl md:text-2xl font-semibold">
