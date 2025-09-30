@@ -3,7 +3,13 @@ import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
 import { getOutpasses, createOutpass } from "../api/studentAPI"; // Import your API functions
 
-const RequestContext = createContext();
+// Provide a safe default so components won't crash if context isn't available briefly
+const RequestContext = createContext({
+  requests: [],
+  loading: false,
+  fetchRequests: async () => {},
+  requestOutpass: async () => {},
+});
 
 export const RequestProvider = ({ children }) => {
   const { token } = useAuth();
@@ -12,11 +18,13 @@ export const RequestProvider = ({ children }) => {
 
   // Fetch all outpasses
   const fetchRequests = async () => {
-    if (!token) return;
+    // If no token yet, still attempt: axios instance will try refresh if needed
     try {
       setLoading(true);
-      const data = await getOutpasses(token); // Use API function
-      setRequests(data);
+      const res = await getOutpasses(); // Use API function (no token param)
+      // API returns { data, page, limit, total } for history endpoint
+      const outpasses = res?.data || res;
+      setRequests(outpasses || []);
     } catch (err) {
       console.error("Fetch error:", err);
       toast.error(err?.response?.data?.message || "Failed to fetch outpasses");
@@ -27,14 +35,9 @@ export const RequestProvider = ({ children }) => {
 
   // Create new outpass
   const requestOutpass = async (formData) => {
-    if (!token) {
-      toast.error("You must be logged in to request outpass");
-      return;
-    }
-
     try {
       setLoading(true);
-      const newOutpass = await createOutpass(formData, token); // Use API function
+      const newOutpass = await createOutpass(formData); // Use API function
       toast.success("Outpass requested successfully!");
       setRequests((prev) => [newOutpass, ...prev]); // Add newly created outpass
       return newOutpass;
@@ -46,9 +49,10 @@ export const RequestProvider = ({ children }) => {
     }
   };
 
-  // Automatically fetch requests when token is available
+  // Automatically fetch requests when token changes (or on mount)
   useEffect(() => {
-    if (token) fetchRequests();
+    fetchRequests();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   return (

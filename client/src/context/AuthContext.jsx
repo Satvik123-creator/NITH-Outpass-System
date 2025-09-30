@@ -21,18 +21,30 @@ export const AuthProvider = ({ children }) => {
   const login = async (data) => {
     const res = await loginUser(data);
     setAuthUser(res.user);
-    setToken(res.token);
+    // Backend sometimes returns the access token as `accessToken` (login)
+    // and signup returns it as `token`. Accept either to be robust.
+    const savedToken = res.token || res.accessToken || res.access_token || null;
+    setToken(savedToken);
     localStorage.setItem("user", JSON.stringify(res.user));
-    localStorage.setItem("token", res.token);
+    if (savedToken) localStorage.setItem("token", savedToken);
+    // If backend provided a plain refresh token (dev only), store it for refresh attempts
+    if (res.refreshToken) {
+      localStorage.setItem("refreshToken", res.refreshToken);
+    }
     return res.user;
   };
 
   const signup = async (data) => {
     const res = await signupUser(data);
     setAuthUser(res.user);
-    setToken(res.token);
+    // Accept either token field name from backend
+    const savedToken = res.token || res.accessToken || res.access_token || null;
+    setToken(savedToken);
     localStorage.setItem("user", JSON.stringify(res.user));
-    localStorage.setItem("token", res.token);
+    if (savedToken) localStorage.setItem("token", savedToken);
+    if (res.refreshToken) {
+      localStorage.setItem("refreshToken", res.refreshToken);
+    }
     return res.user;
   };
 
@@ -41,6 +53,7 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("refreshToken");
   };
 
   return (

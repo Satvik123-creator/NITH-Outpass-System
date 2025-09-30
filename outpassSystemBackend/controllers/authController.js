@@ -208,8 +208,14 @@ export const login = async (req, res) => {
       expires: new Date(refreshExpiresAt),
     });
 
+    // In development mode you may want the plain refresh token returned in body
+    // for environments where cookies are not preserved (e.g., some local setups).
+    const includePlainRefresh = process.env.DEV_REFRESH_IN_BODY === "true";
+
     res.json({
       accessToken,
+      // include refreshToken in response only if explicitly allowed
+      ...(includePlainRefresh ? { refreshToken: refreshTokenPlain } : {}),
       user: {
         id: user._id,
         name: user.name,

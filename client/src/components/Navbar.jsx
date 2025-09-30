@@ -12,7 +12,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="bg-[#071133] text-white shadow-md w-full py-4">
+    <nav className="bg-gradient-to-b from-[#0b5fff] to-[#071133] text-white shadow-md w-full py-4">
       <div className="flex items-center justify-between px-6 sm:px-8 lg:px-24 w-full">
         <Link to="/" className="flex items-center gap-3">
           <img
