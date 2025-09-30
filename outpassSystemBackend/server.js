@@ -3,6 +3,7 @@ import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
 import helmet from "helmet";
+import logger from "./lib/logger.js";
 import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import cookieParser from "cookie-parser";
@@ -14,6 +15,7 @@ dotenv.config();
 
 const app = express();
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:5173";
+// Sentry was removed from this project; logging remains enabled
 app.use(
   cors({
     origin: FRONTEND_ORIGIN,
@@ -52,4 +54,6 @@ app.use("/api/outpasses", wardenRoutes); // New route for outpass
 await connectDB();
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on ${PORT}`));
+app.listen(PORT, () => logger.info(`Server running on ${PORT}`));
+
+// No Sentry error handler configured (Sentry integration removed)
