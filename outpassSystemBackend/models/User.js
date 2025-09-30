@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, enum: ["student", "warden"], required: true },
+  // Brute-force protection fields
+  failedLoginAttempts: { type: Number, default: 0 },
+  lockUntil: { type: Date },
   // Fields to support password reset flow
   resetPasswordToken: { type: String },
   resetPasswordExpires: { type: Date },

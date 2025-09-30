@@ -136,14 +136,43 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "User not found" });
     }
 
+    // check if account is locked
+    if (user.lockUntil && user.lockUntil > Date.now()) {
+      const waitSeconds = Math.ceil((user.lockUntil - Date.now()) / 1000);
+      return res
+        .status(423)
+        .json({
+          message: `Account locked. Try again in ${waitSeconds} seconds`,
+        });
+    }
+
     // compare passwords
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
+      // increment failed attempts
+      user.failedLoginAttempts = (user.failedLoginAttempts || 0) + 1;
+      const MAX_FAILED = 5;
+      const LOCK_MINUTES = 15;
+      if (user.failedLoginAttempts >= MAX_FAILED) {
+        user.lockUntil = Date.now() + LOCK_MINUTES * 60 * 1000; // lock for 15 minutes
+        console.log(
+          `User ${user.email} locked until ${new Date(user.lockUntil)}`
+        );
+      }
+      await user.save();
       console.log("Login failed: invalid credentials for user", {
         userId: user._id,
         email: user.email,
+        failedLoginAttempts: user.failedLoginAttempts,
       });
       return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // reset failed login counters on successful login
+    if (user.failedLoginAttempts && user.failedLoginAttempts > 0) {
+      user.failedLoginAttempts = 0;
+      user.lockUntil = undefined;
+      await user.save();
     }
 
     // generate token
