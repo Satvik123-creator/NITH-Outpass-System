@@ -15,24 +15,26 @@ import {
   forgotPasswordValidator,
   resetPasswordValidator,
 } from "../validators/requestValidators.js";
+import { authLimiter, otpLimiter } from "../middlewares/rateLimiter.js";
 
 const router = express.Router();
 
 // Signup for both student and warden
 router.post("/signup", signupValidator, validateRequest, signup);
 
-// Login for both student and warden
-router.post("/login", loginValidator, validateRequest, login);
+// Login for both student and warden (rate limited)
+router.post("/login", authLimiter, loginValidator, validateRequest, login);
 
-// POST /api/otp/send
-router.post("/send-otp", otpValidator, validateRequest, sendOtp);
+// POST /api/otp/send (OTP limiter)
+router.post("/send-otp", otpLimiter, otpValidator, validateRequest, sendOtp);
 
 // POST /api/otp/verify
 router.post("/verify-otp", otpValidator, validateRequest, verifyOtp);
 
-// POST /auth/forgot-password
+// POST /auth/forgot-password (rate limited)
 router.post(
   "/forgot-password",
+  authLimiter,
   forgotPasswordValidator,
   validateRequest,
   forgotPassword
