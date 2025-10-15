@@ -4,6 +4,11 @@ import Select from "react-select";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 import axios from "axios";
+import {
+  sendSignInLinkToEmail,
+  firebaseAuth,
+  validateFirebaseSetup,
+} from "../../firebase";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -32,6 +37,13 @@ const Student = () => {
     }
   };
 
+  const actionCodeSettings = {
+    url: `${
+      import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173"
+    }/finishSignIn`,
+    handleCodeInApp: true,
+  };
+
   const handleStudentRegister = async (e) => {
     e.preventDefault();
     if (!email.endsWith("@nith.ac.in")) {
@@ -40,11 +52,30 @@ const Student = () => {
     }
 
     try {
-      await axios.post(`${API_URL}/auth/send-otp`, { email });
-      toast.success("OTP sent to your email");
-      setIsSubmitted(true);
+      // diagnostic: ensure firebase config looks valid at runtime
+      const diag = validateFirebaseSetup();
+      if (!diag.ok) {
+        console.error(
+          "Firebase config missing keys:",
+          diag.missing,
+          diag.options
+        );
+        toast.error(
+          "Firebase not configured correctly. Check console for details."
+        );
+        return;
+      }
+      console.log("Firebase runtime options:", diag.options);
+      await sendSignInLinkToEmail(firebaseAuth, email, actionCodeSettings);
+      localStorage.setItem("emailForSignIn", email);
+      toast.success(
+        "Sign-in link sent to your email. Please check your mailbox."
+      );
+      // Optionally keep user on page; they will click link in their email to continue
+      setShowRegister(false);
     } catch (err) {
-      toast.error("Failed to send OTP");
+      console.error("sendSignInLinkToEmail error:", err);
+      toast.error("Failed to send sign-in link");
     }
   };
 

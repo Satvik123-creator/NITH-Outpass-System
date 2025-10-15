@@ -332,13 +332,18 @@ let otpStore = {};
 export const sendOtp = async (req, res) => {
   const { email } = req.body;
 
-  // Generate 6-digit OTP
+  // Generate 6-digit OTP and save in memory store
   const otp = Math.floor(100000 + Math.random() * 900000);
-  // Save OTP
   otpStore[email] = otp;
-  console.log("OTP generated for", email, ":", otp);
+  console.log("OTP generated for", email);
 
-  // Nodemailer setup (configurable via env)
+  // If dev fallback is enabled, return OTP in response for local testing
+  if (process.env.DEV_EMAIL_FALLBACK === "true") {
+    console.log("DEV_EMAIL_FALLBACK enabled - returning OTP in response");
+    return res.status(200).json({ message: "OTP (dev)", otp });
+  }
+
+  // Build transporter using env config
   const mailHost = process.env.EMAIL_HOST || "smtp.gmail.com";
   const mailPort = process.env.EMAIL_PORT
     ? Number(process.env.EMAIL_PORT)
@@ -361,24 +366,21 @@ export const sendOtp = async (req, res) => {
     text: `Your OTP is ${otp}. It is valid for 10 minutes.`,
   };
 
-  // If dev fallback is enabled, return OTP in response instead of sending email
-  if (process.env.DEV_EMAIL_FALLBACK === "true") {
-    console.log("DEV_EMAIL_FALLBACK enabled - returning OTP in response");
-    return res.status(200).json({ message: "OTP (dev)", otp });
-  }
-
   try {
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ message: "OTP sent successfully" });
+    return res.status(200).json({ message: "OTP sent successfully" });
   } catch (err) {
-    console.error("Failed to send OTP: ", err);
-    // If fallback enabled, return OTP for local testing
-    if (process.env.DEV_EMAIL_FALLBACK === "true") {
-      return res.status(200).json({ message: "OTP (dev)", otp });
-    }
+    console.error(
+      "Failed to send OTP:",
+      err && err.message ? err.message : err
+    );
+    // For dev convenience, still return OTP if fallback enabled (handled above)
     res.status(500).json({ message: "Failed to send OTP" });
   }
 };
+
+// Dev-only endpoint to verify SMTP connectivity. Useful to call from browser during local debugging.
+// (removed debugSmtp and limiterInfo helpers to keep OTP flow minimal)
 
 // Verify OTP
 export const verifyOtp = (req, res) => {
@@ -479,5 +481,119 @@ export const resetPassword = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// POST /auth/firebase-callback
+export const firebaseCallback = async (req, res) => {
+  const { idToken } = req.body;
+  if (!idToken) return res.status(400).json({ message: "Missing idToken" });
+  try {
+    // lazy import to avoid requiring firebase-admin unless used
+    const admin = await import("../lib/firebaseAdmin.js");
+    if (!admin.default || !admin.default.auth) {
+      return res
+        .status(500)
+        .json({ message: "Firebase admin not initialized" });
+    }
+    const decoded = await admin.default.auth().verifyIdToken(idToken);
+    const { uid, email, name } = decoded;
+    // find or create local user
+    let user = await User.findOne({ email });
+    if (!user) {
+      // ensure required schema fields are provided
+      const displayName = name && name.trim() ? name : null;
+      // derive local part of email
+      const localPart = email.split("@")[0];
+      // enrollment pattern like 23bcs100 or 23BME061
+      const enrollmentMatch = /^[0-9]{2}[A-Za-z]{3}[0-9]{3}$/.test(localPart);
+      const enrollmentNo = enrollmentMatch
+        ? localPart.toUpperCase()
+        : undefined;
+
+      // choose a sensible name fallback: prefer firebase name, else if enrollment-like use that, else use localPart
+      const finalName =
+        displayName || (enrollmentNo ? enrollmentNo : localPart);
+
+      // generate a random password for firebase-created users so schema validation passes
+      const randomPassword = crypto.randomBytes(32).toString("hex");
+      const hashedPassword = await bcrypt.hash(randomPassword, 10);
+
+      const userData = {
+        name: finalName,
+        email,
+        role: "student",
+        firebaseUid: uid,
+        password: hashedPassword,
+      };
+      if (enrollmentNo) userData.enrollmentNo = enrollmentNo;
+
+      user = new User(userData);
+      try {
+        await user.save();
+      } catch (saveErr) {
+        // handle possible race where another process inserted the same email concurrently
+        if (saveErr && saveErr.code === 11000) {
+          console.warn(
+            "Duplicate key on user save; refetching existing user for email",
+            email
+          );
+          user = await User.findOne({ email });
+          if (!user) throw saveErr; // rethrow if we still don't have a user
+        } else {
+          throw saveErr;
+        }
+      }
+    } else if (!user.firebaseUid) {
+      user.firebaseUid = uid;
+      await user.save();
+    }
+
+    // If the user exists but missing enrollment or has a non-descriptive name,
+    // try to populate from the email local-part or decoded Firebase name.
+    try {
+      const localPart = email.split("@")[0];
+      const enrollmentMatch = /^[0-9]{2}[A-Za-z]{3}[0-9]{3}$/.test(localPart);
+      const maybeEnrollment = enrollmentMatch
+        ? localPart.toUpperCase()
+        : undefined;
+
+      let needSave = false;
+      // fill enrollmentNo when possible
+      if (!user.enrollmentNo && maybeEnrollment) {
+        user.enrollmentNo = maybeEnrollment;
+        needSave = true;
+      }
+      // if name is empty or equal to the raw localPart (lowercase), replace with better value
+      const displayName = name && name.trim() ? name : undefined;
+      if (!user.name || user.name === localPart) {
+        user.name = displayName || (maybeEnrollment || localPart).toString();
+        needSave = true;
+      }
+      if (needSave) await user.save();
+    } catch (updateErr) {
+      console.warn(
+        "Failed to auto-fill user profile fields:",
+        updateErr.message || updateErr
+      );
+    }
+    // generate app access token
+    const accessToken = jwt.sign(
+      { id: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "15m" }
+    );
+    res.json({
+      accessToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    console.error("firebaseCallback error:", err);
+    res.status(401).json({ message: "Invalid token" });
   }
 };

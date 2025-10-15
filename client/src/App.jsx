@@ -14,6 +14,7 @@ import StudentRequestDetails from "./pages/student/StudentRequestDetails";
 import StudentForgotPassword from "./pages/auth/StudentForgotPassword";
 import WardenForgotPassword from "./pages/auth/WardenForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import FinishSignIn from "./pages/auth/FinishSignIn";
 
 import "./App.css"; // Tailwind CSS import
 import { ToastContainer } from "react-toastify";
@@ -57,6 +58,7 @@ function App() {
               element={<WardenForgotPassword />}
             />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/finishSignIn" element={<FinishSignIn />} />
           </Routes>
         </Router>
       </RequestProvider>
