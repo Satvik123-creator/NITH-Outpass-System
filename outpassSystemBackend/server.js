@@ -10,7 +10,6 @@ import cookieParser from "cookie-parser";
 import studentRoutes from "./routes/studentRoutes.js";
 import wardenRoutes from "./routes/wardenRoutes.js";
 import { generalLimiter } from "./middlewares/rateLimiter.js";
-
 dotenv.config();
 
 const app = express();
@@ -62,4 +61,4 @@ await connectDB();
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => logger.info(`Server running on ${PORT}`));
 
-// No Sentry error handler configured (Sentry integration removed)
+

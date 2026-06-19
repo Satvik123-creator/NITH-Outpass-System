@@ -3,14 +3,6 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
-import axios from "axios";
-import {
-  sendSignInLinkToEmail,
-  firebaseAuth,
-  validateFirebaseSetup,
-} from "../../firebase";
-
-const API_URL = import.meta.env.VITE_API_URL;
 
 const Student = () => {
   const navigate = useNavigate();
@@ -21,9 +13,7 @@ const Student = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [hostel, setHostel] = useState("");
-  const [otp, setOtp] = useState("");
-  const [isSubmitted, setIsSubmitted] = useState(false); // whether OTP sent and waiting for code
-  const [showRegister, setShowRegister] = useState(false); // toggle between login and register
+  const [showRegister, setShowRegister] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
 
   const handleStudentLogin = async (e) => {
@@ -37,13 +27,6 @@ const Student = () => {
     }
   };
 
-  const actionCodeSettings = {
-    url: `${
-      import.meta.env.VITE_FRONTEND_URL || "http://localhost:5173"
-    }/finishSignIn`,
-    handleCodeInApp: true,
-  };
-
   const handleStudentRegister = async (e) => {
     e.preventDefault();
     if (!email.endsWith("@nith.ac.in")) {
@@ -52,37 +35,6 @@ const Student = () => {
     }
 
     try {
-      // diagnostic: ensure firebase config looks valid at runtime
-      const diag = validateFirebaseSetup();
-      if (!diag.ok) {
-        console.error(
-          "Firebase config missing keys:",
-          diag.missing,
-          diag.options
-        );
-        toast.error(
-          "Firebase not configured correctly. Check console for details."
-        );
-        return;
-      }
-      console.log("Firebase runtime options:", diag.options);
-      await sendSignInLinkToEmail(firebaseAuth, email, actionCodeSettings);
-      localStorage.setItem("emailForSignIn", email);
-      toast.success(
-        "Sign-in link sent to your email. Please check your mailbox."
-      );
-      // Optionally keep user on page; they will click link in their email to continue
-      setShowRegister(false);
-    } catch (err) {
-      console.error("sendSignInLinkToEmail error:", err);
-      toast.error("Failed to send sign-in link");
-    }
-  };
-
-  const handleOtpSubmitted = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${API_URL}/auth/verify-otp`, { email, otp });
       await signup({
         name,
         enrollmentNo: enrollment,
@@ -94,7 +46,7 @@ const Student = () => {
       toast.success("Signup successful");
       navigate("/student/dashboard");
     } catch (err) {
-      toast.error(err.response?.data?.message || "OTP verification failed");
+      toast.error(err.response?.data?.message || "Signup failed");
     }
   };
 
@@ -149,161 +101,119 @@ const Student = () => {
               </p>
             </div>
 
-            {isSubmitted ? (
-              <div>
-                <h2 className="text-xl font-semibold mb-4 text-center">
-                  Email Verification
-                </h2>
-                <p className="text-sm text-gray-600 mb-3">
-                  Please check your email id and enter the OTP
+            {!showRegister ? (
+              <div className="mb-6">
+                <p className="text-sm mb-3 text-gray-600">
+                  Registered Student? Login Now
                 </p>
                 <form
-                  onSubmit={handleOtpSubmitted}
                   className="flex flex-col gap-4"
+                  onSubmit={handleStudentLogin}
                 >
                   <input
-                    type="number"
-                    name="otp"
-                    placeholder="Enter the OTP"
+                    type="text"
+                    placeholder="Enrollment Number"
+                    className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) =>
+                      setEnrollment(e.target.value.toUpperCase())
+                    }
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
                     className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="btn btn-md btn-green w-full"
+                  >
+                    Login
+                  </button>
+                </form>
+                <div className="mt-3 flex justify-between items-center">
+                  <button
+                    className="text-blue-600 hover:underline text-sm cursor-pointer"
+                    onClick={() => setShowRegister(true)}
+                  >
+                    Don't have an account? Sign up
+                  </button>
+                  <button
+                    className="text-blue-600 hover:underline text-sm cursor-pointer"
+                    onClick={() => navigate("/StudentForgotPassword")}
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <p className="text-sm mb-3 text-gray-600">
+                  Create a student account
+                </p>
+                <form
+                  className="flex flex-col gap-4"
+                  onSubmit={handleStudentRegister}
+                >
+                  <input
+                    type="text"
+                    placeholder="Full Name"
+                    className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setName(e.target.value.toUpperCase())}
+                    required
+                  />
+                  <input
+                    type="text"
+                    placeholder="Enrollment Number"
+                    className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) =>
+                      setEnrollment(e.target.value.toUpperCase())
+                    }
+                    required
+                  />
+                  <input
+                    type="email"
+                    placeholder="Email Address (@nith.ac.in)"
+                    className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
+                  <input
+                    type="password"
+                    placeholder="Password"
+                    className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <label htmlFor="hostel" className="text-sm font-medium">
+                    Hostel No.
+                  </label>
+                  <Select
+                    value={selectedOption}
+                    onChange={handleHostelChange}
+                    options={hostelOptions}
+                    placeholder="Select your hostel.."
                     required
                   />
                   <div className="flex gap-3">
                     <button
                       type="submit"
-                      className="btn btn-md btn-blue w-full"
+                      className="btn btn-md btn-accent w-full"
                     >
-                      Verify
+                      Register
                     </button>
                     <button
                       type="button"
-                      onClick={() => setIsSubmitted(false)}
+                      onClick={() => setShowRegister(false)}
                       className="btn btn-md btn-neutral w-full"
                     >
-                      Cancel
+                      Back
                     </button>
                   </div>
                 </form>
               </div>
-            ) : (
-              <>
-                {!showRegister ? (
-                  <div className="mb-6">
-                    <p className="text-sm mb-3 text-gray-600">
-                      Registered Student? Login Now
-                    </p>
-                    <form
-                      className="flex flex-col gap-4"
-                      onSubmit={handleStudentLogin}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Enrollment Number"
-                        className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={(e) =>
-                          setEnrollment(e.target.value.toUpperCase())
-                        }
-                        required
-                      />
-                      <input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                      <button
-                        type="submit"
-                        className="btn btn-md btn-green w-full"
-                      >
-                        Login
-                      </button>
-                    </form>
-                    <div className="mt-3 flex justify-between items-center">
-                      <button
-                        className="text-blue-600 hover:underline text-sm cursor-pointer"
-                        onClick={() => setShowRegister(true)}
-                      >
-                        Don't have an account? Sign up
-                      </button>
-                      <button
-                        className="text-blue-600 hover:underline text-sm cursor-pointer"
-                        onClick={() => navigate("/StudentForgotPassword")}
-                      >
-                        Forgot Password?
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div>
-                    <p className="text-sm mb-3 text-gray-600">
-                      Create a student account
-                    </p>
-                    <form
-                      className="flex flex-col gap-4"
-                      onSubmit={handleStudentRegister}
-                    >
-                      <input
-                        type="text"
-                        placeholder="Full Name"
-                        className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={(e) => setName(e.target.value.toUpperCase())}
-                        required
-                      />
-                      <input
-                        type="text"
-                        placeholder="Enrollment Number"
-                        className="w-full p-2 border border-gray-200 rounded-md text-gray-900 uppercase focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={(e) =>
-                          setEnrollment(e.target.value.toUpperCase())
-                        }
-                        required
-                      />
-                      <input
-                        type="email"
-                        placeholder="Email Address (@nith.ac.in)"
-                        className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
-                      <input
-                        type="password"
-                        placeholder="Password"
-                        className="w-full p-2 border border-gray-200 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                      />
-                      <label htmlFor="hostel" className="text-sm font-medium">
-                        Hostel No.
-                      </label>
-                      <Select
-                        value={selectedOption}
-                        onChange={handleHostelChange}
-                        options={hostelOptions}
-                        placeholder="Select your hostel.."
-                        required
-                      />
-                      <div className="flex gap-3">
-                        <button
-                          type="submit"
-                          className="btn btn-md btn-accent w-full"
-                        >
-                          Register
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setShowRegister(false)}
-                          className="btn btn-md btn-neutral w-full"
-                        >
-                          Back
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                )}
-              </>
             )}
           </div>
         </main>

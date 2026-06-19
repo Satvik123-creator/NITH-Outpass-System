@@ -20,7 +20,17 @@ export const protect = async (req, res, next) => {
           .json({ message: "Not authorized, token missing" });
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET);
+      } catch (e) {
+        // distinguish expired token vs others
+        if (e.name === "TokenExpiredError") {
+          console.warn("JWT verification failed: token expired");
+          return res.status(401).json({ message: "Token expired" });
+        }
+        throw e;
+      }
       req.user = await User.findById(decoded.id).select("-password");
 
       if (!req.user) {
@@ -41,11 +51,9 @@ export const protect = async (req, res, next) => {
 export const authorizeRoles = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      return res
-        .status(403)
-        .json({
-          message: "You do not have permission to access this resource",
-        });
+      return res.status(403).json({
+        message: "You do not have permission to access this resource",
+      });
     }
     next();
   };

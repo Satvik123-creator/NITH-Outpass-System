@@ -2,12 +2,12 @@ import React from "react";
 
 export default function StatusBadge({ status }) {
   const colors = {
-    pending: "bg-yellow-300 text-black",
-    approved: "bg-green-500 text-white",
-    rejected: "bg-red-500 text-white",
+    pending: "bg-amber-50 text-amber-700 border border-amber-200",
+    approved: "bg-emerald-50 text-emerald-700 border border-emerald-200",
+    rejected: "bg-red-50 text-red-700 border border-red-200",
   };
   return (
-    <span className={`px-2 py-1 rounded ${colors[status] || "bg-gray-200"}`}>
+    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${colors[status] || "bg-gray-50 text-gray-600 border border-gray-200"}`}>
       {status}
     </span>
   );

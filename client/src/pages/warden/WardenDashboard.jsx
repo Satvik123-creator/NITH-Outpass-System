@@ -8,7 +8,7 @@ import Navbar from "../../components/Navbar";
 
 function formatDateTime(dt) {
   try {
-    return new Date(dt).toLocaleString();
+    return new Date(dt).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
   } catch (e) {
     return dt;
   }
@@ -26,20 +26,16 @@ export default function WardenDashboard() {
       setRequests(outpasses);
     } catch (err) {
       console.error("Warden fetch error:", err);
-      // swallow and show friendly message
       setRequests([]);
     }
   };
 
   useEffect(() => {
-    // Wait until auth state is ready. If there's no token or user, don't fetch.
     if (!token) return;
     if (!authUser) {
-      // auth still initializing; do nothing yet
       return;
     }
 
-    // Defensive: if user is not a warden, show message and redirect
     if (authUser.role !== "warden") {
       toast.error("You do not have permission to access the warden dashboard");
       navigate("/");
@@ -60,83 +56,116 @@ export default function WardenDashboard() {
   const previous = Array.isArray(requests)
     ? requests.filter((r) => r.status !== "pending")
     : [];
+  const approved = Array.isArray(requests)
+    ? requests.filter((r) => r.status === "approved")
+    : [];
+  const rejected = Array.isArray(requests)
+    ? requests.filter((r) => r.status === "rejected")
+    : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-[#F5F7FA]">
       <Navbar />
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex items-start justify-between gap-6 mb-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-extrabold text-gray-900">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
               Warden Dashboard
             </h1>
-            <p className="mt-2 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-gray-500">
               Manage and review student outpass requests for your hostel.
             </p>
           </div>
         </div>
 
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <div className="text-2xl font-bold text-gray-900">{requests?.length || 0}</div>
+            <div className="text-sm text-gray-500 mt-1">Total Requests</div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <div className="text-2xl font-bold text-amber-600">{pending.length}</div>
+            <div className="text-sm text-gray-500 mt-1">Pending</div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <div className="text-2xl font-bold text-emerald-600">{approved.length}</div>
+            <div className="text-sm text-gray-500 mt-1">Approved</div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+            <div className="text-2xl font-bold text-red-600">{rejected.length}</div>
+            <div className="text-sm text-gray-500 mt-1">Rejected</div>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <section className="lg:col-span-2">
-            <div className="bg-white border border-gray-100 rounded-2xl shadow p-6 mb-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-yellow-600">
+          <section className="lg:col-span-2 space-y-6">
+            {/* Pending */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 className="text-base font-semibold text-gray-900">
                   Pending Outpasses
                 </h2>
-                <div className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
                   {pending.length} pending
-                </div>
+                </span>
               </div>
 
-              <div className="mt-4">
+              <div className="p-6">
                 {pending.length === 0 ? (
-                  <div className="py-8 text-center text-gray-500">
-                    No pending outpasses
+                  <div className="py-10 text-center">
+                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p className="text-gray-400 font-medium">No pending outpasses</p>
+                    <p className="text-gray-400 text-sm mt-1">All requests have been reviewed.</p>
                   </div>
                 ) : (
                   <ul className="space-y-3">
                     {pending.map((r) => (
                       <li
                         key={r._id}
-                        className="group bg-yellow-50 hover:bg-yellow-100 border border-transparent hover:border-yellow-200 p-4 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition"
+                        className="bg-amber-50/50 border border-amber-100 rounded-lg p-4"
                       >
-                        <div>
-                          <div className="font-medium text-gray-800">
-                            {r.reason || r.purpose}
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-gray-900 truncate">
+                              {r.reason || r.purpose}
+                            </div>
+                            <div className="text-sm text-gray-500 mt-0.5">
+                              {formatDateTime(r.createdAt)}
+                            </div>
+                            <div className="text-sm text-gray-500 mt-0.5">
+                              {r.student?.name} &middot; {r.student?.enrollmentNo}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-600 mt-1">
-                            Applied on: {formatDateTime(r.createdAt)}
-                          </div>
-                          <div className="text-sm text-gray-500 mt-1">
-                            Student: {r.student?.name} •{" "}
-                            {r.student?.enrollmentNo}
-                          </div>
-                        </div>
 
-                        <div className="flex items-center gap-3 mt-3 sm:mt-0">
-                          <button
-                            onClick={() =>
-                              navigate(`/warden/request/${r._id}`, {
-                                state: { outpass: r },
-                              })
-                            }
-                            className="btn btn-md btn-blue"
-                          >
-                            View
-                          </button>
-                          <button
-                            onClick={() => handleUpdate(r._id, "approved")}
-                            className="btn btn-md btn-green"
-                          >
-                            Approve
-                          </button>
-                          <button
-                            onClick={() => handleUpdate(r._id, "rejected")}
-                            className="btn btn-md btn-red"
-                          >
-                            Reject
-                          </button>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <button
+                              onClick={() =>
+                                navigate(`/warden/request/${r._id}`, {
+                                  state: { outpass: r },
+                                })
+                              }
+                              className="btn btn-sm btn-outline"
+                            >
+                              View
+                            </button>
+                            <button
+                              onClick={() => handleUpdate(r._id, "approved")}
+                              className="btn btn-sm btn-green"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => handleUpdate(r._id, "rejected")}
+                              className="btn btn-sm btn-red"
+                            >
+                              Reject
+                            </button>
+                          </div>
                         </div>
                       </li>
                     ))}
@@ -145,51 +174,54 @@ export default function WardenDashboard() {
               </div>
             </div>
 
-            <div className="bg-white border border-gray-100 rounded-2xl shadow p-6">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-800">
+            {/* Previous */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                <h2 className="text-base font-semibold text-gray-900">
                   Previous Outpasses
                 </h2>
-                <div className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
                   {previous.length} total
-                </div>
+                </span>
               </div>
 
-              <div className="mt-4">
+              <div className="p-6">
                 {previous.length === 0 ? (
-                  <div className="py-8 text-center text-gray-500">
-                    No previous outpasses
+                  <div className="py-10 text-center">
+                    <svg className="w-12 h-12 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                    </svg>
+                    <p className="text-gray-400 font-medium">No previous outpasses</p>
                   </div>
                 ) : (
                   <ul className="space-y-3">
                     {previous.map((r) => (
                       <li
                         key={r._id}
-                        className="bg-white hover:bg-gray-50 border border-gray-100 p-4 rounded-xl flex items-center justify-between gap-4 transition"
+                        className="border border-gray-100 rounded-lg p-4 hover:bg-gray-50 transition-colors"
                       >
-                        <div>
-                          <div className="font-medium text-gray-800">
-                            {r.reason || r.purpose}
+                        <div className="flex items-center justify-between gap-4">
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium text-gray-900 truncate">
+                              {r.reason || r.purpose}
+                            </div>
+                            <div className="text-sm text-gray-500 mt-0.5">
+                              {r.student?.name} &middot; {r.student?.enrollmentNo} &middot; {formatDateTime(r.createdAt)}
+                            </div>
                           </div>
-                          <div className="text-sm text-gray-500 mt-1">
-                            Applied on: {formatDateTime(r.createdAt)}
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <button
+                              onClick={() =>
+                                navigate(`/warden/request/${r._id}`, {
+                                  state: { outpass: r },
+                                })
+                              }
+                              className="btn btn-sm btn-outline"
+                            >
+                              View
+                            </button>
+                            <StatusBadge status={r.status} />
                           </div>
-                          <div className="text-sm text-gray-500 mt-1">
-                            {r.student?.name} • {r.student?.enrollmentNo}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <button
-                            onClick={() =>
-                              navigate(`/warden/request/${r._id}`, {
-                                state: { outpass: r },
-                              })
-                            }
-                            className="btn btn-md btn-blue"
-                          >
-                            View
-                          </button>
-                          <StatusBadge status={r.status} />
                         </div>
                       </li>
                     ))}
@@ -199,28 +231,39 @@ export default function WardenDashboard() {
             </div>
           </section>
 
-          <aside className="hidden lg:block">
-            <div className="sticky top-24 space-y-4">
-              <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow">
-                <h3 className="text-sm font-medium text-gray-700">Summary</h3>
-                <div className="mt-3 text-2xl font-bold text-gray-900">
-                  {requests?.length || 0}
+          {/* Sidebar */}
+          <aside className="space-y-4">
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Summary</h3>
+              <div className="mt-4 space-y-3">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Total</span>
+                  <span className="font-semibold text-gray-900">{requests?.length || 0}</span>
                 </div>
-                <div className="text-sm text-gray-500">Total requests</div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Pending</span>
+                  <span className="font-semibold text-amber-600">{pending.length}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Approved</span>
+                  <span className="font-semibold text-emerald-600">{approved.length}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">Rejected</span>
+                  <span className="font-semibold text-red-600">{rejected.length}</span>
+                </div>
               </div>
+            </div>
 
-              <div className="bg-white border border-gray-100 rounded-2xl p-4 shadow">
-                <h3 className="text-sm font-medium text-gray-700">
-                  Quick Actions
-                </h3>
-                <div className="mt-2 flex flex-col gap-2">
-                  <button
-                    onClick={fetchRequests}
-                    className="btn btn-md btn-neutral"
-                  >
-                    Refresh
-                  </button>
-                </div>
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+              <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">Quick Actions</h3>
+              <div className="mt-3">
+                <button
+                  onClick={fetchRequests}
+                  className="btn btn-sm btn-neutral w-full"
+                >
+                  Refresh Requests
+                </button>
               </div>
             </div>
           </aside>

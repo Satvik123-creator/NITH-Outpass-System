@@ -284,6 +284,11 @@ export const refreshToken = async (req, res) => {
       { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "15m" }
     );
 
+    console.debug("refreshToken: issued new access token for user", {
+      userId: user._id,
+      role: user.role,
+    });
+
     const isProd = process.env.NODE_ENV === "production";
     res.cookie("refreshToken", newRefreshPlain, {
       httpOnly: true,
@@ -484,116 +489,33 @@ export const resetPassword = async (req, res) => {
   }
 };
 
-// POST /auth/firebase-callback
-export const firebaseCallback = async (req, res) => {
-  const { idToken } = req.body;
-  if (!idToken) return res.status(400).json({ message: "Missing idToken" });
+// PATCH /auth/me - update the current user's profile (protected)
+export const updateProfile = async (req, res) => {
   try {
-    // lazy import to avoid requiring firebase-admin unless used
-    const admin = await import("../lib/firebaseAdmin.js");
-    if (!admin.default || !admin.default.auth) {
-      return res
-        .status(500)
-        .json({ message: "Firebase admin not initialized" });
+    const { name } = req.body;
+    if (!name || typeof name !== "string" || !name.trim()) {
+      return res.status(400).json({ message: "Name is required" });
     }
-    const decoded = await admin.default.auth().verifyIdToken(idToken);
-    const { uid, email, name } = decoded;
-    // find or create local user
-    let user = await User.findOne({ email });
-    if (!user) {
-      // ensure required schema fields are provided
-      const displayName = name && name.trim() ? name : null;
-      // derive local part of email
-      const localPart = email.split("@")[0];
-      // enrollment pattern like 23bcs100 or 23BME061
-      const enrollmentMatch = /^[0-9]{2}[A-Za-z]{3}[0-9]{3}$/.test(localPart);
-      const enrollmentNo = enrollmentMatch
-        ? localPart.toUpperCase()
-        : undefined;
+    // req.user is populated by protect middleware
+    const user = await User.findById(req.user._id);
+    if (!user) return res.status(404).json({ message: "User not found" });
 
-      // choose a sensible name fallback: prefer firebase name, else if enrollment-like use that, else use localPart
-      const finalName =
-        displayName || (enrollmentNo ? enrollmentNo : localPart);
+    user.name = name.trim();
+    await user.save();
 
-      // generate a random password for firebase-created users so schema validation passes
-      const randomPassword = crypto.randomBytes(32).toString("hex");
-      const hashedPassword = await bcrypt.hash(randomPassword, 10);
-
-      const userData = {
-        name: finalName,
-        email,
-        role: "student",
-        firebaseUid: uid,
-        password: hashedPassword,
-      };
-      if (enrollmentNo) userData.enrollmentNo = enrollmentNo;
-
-      user = new User(userData);
-      try {
-        await user.save();
-      } catch (saveErr) {
-        // handle possible race where another process inserted the same email concurrently
-        if (saveErr && saveErr.code === 11000) {
-          console.warn(
-            "Duplicate key on user save; refetching existing user for email",
-            email
-          );
-          user = await User.findOne({ email });
-          if (!user) throw saveErr; // rethrow if we still don't have a user
-        } else {
-          throw saveErr;
-        }
-      }
-    } else if (!user.firebaseUid) {
-      user.firebaseUid = uid;
-      await user.save();
-    }
-
-    // If the user exists but missing enrollment or has a non-descriptive name,
-    // try to populate from the email local-part or decoded Firebase name.
-    try {
-      const localPart = email.split("@")[0];
-      const enrollmentMatch = /^[0-9]{2}[A-Za-z]{3}[0-9]{3}$/.test(localPart);
-      const maybeEnrollment = enrollmentMatch
-        ? localPart.toUpperCase()
-        : undefined;
-
-      let needSave = false;
-      // fill enrollmentNo when possible
-      if (!user.enrollmentNo && maybeEnrollment) {
-        user.enrollmentNo = maybeEnrollment;
-        needSave = true;
-      }
-      // if name is empty or equal to the raw localPart (lowercase), replace with better value
-      const displayName = name && name.trim() ? name : undefined;
-      if (!user.name || user.name === localPart) {
-        user.name = displayName || (maybeEnrollment || localPart).toString();
-        needSave = true;
-      }
-      if (needSave) await user.save();
-    } catch (updateErr) {
-      console.warn(
-        "Failed to auto-fill user profile fields:",
-        updateErr.message || updateErr
-      );
-    }
-    // generate app access token
-    const accessToken = jwt.sign(
-      { id: user._id, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_EXPIRES || "15m" }
-    );
     res.json({
-      accessToken,
+      message: "Profile updated",
       user: {
         id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
+        enrollmentNo: user.enrollmentNo,
       },
     });
   } catch (err) {
-    console.error("firebaseCallback error:", err);
-    res.status(401).json({ message: "Invalid token" });
+    console.error("updateProfile error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
+

@@ -17,11 +17,4 @@ export const authLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// OTP specific limiter (tighter)
-export const otpLimiter = rateLimit({
-  windowMs: 60 * 60 * 1000, // 1 hour
-  max: 5, // 5 OTP-related requests per hour per IP
-  message: { message: "Too many OTP requests, please try after an hour." },
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+

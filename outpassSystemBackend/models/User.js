@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  name: { type: String, required: true },
+  // Name is optional for passwordless accounts; signup flow enforces name for local users.
+  name: { type: String },
   enrollmentNo: { type: String, unique: true, sparse: true }, // only students need this
   employeeNo: { type: String, unique: true, sparse: true }, // only wardens need this
   hostelName: { type: String },

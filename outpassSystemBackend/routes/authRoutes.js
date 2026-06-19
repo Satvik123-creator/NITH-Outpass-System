@@ -6,7 +6,7 @@ import {
   verifyOtp,
   forgotPassword,
   resetPassword,
-  firebaseCallback,
+  updateProfile,
 } from "../controllers/authController.js";
 import validateRequest from "../middlewares/validateRequest.js";
 import {
@@ -17,6 +17,7 @@ import {
   resetPasswordValidator,
 } from "../validators/requestValidators.js";
 import { authLimiter } from "../middlewares/rateLimiter.js";
+import { protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
@@ -49,11 +50,12 @@ router.post(
   resetPassword
 );
 
-// Firebase callback: exchange idToken for app token/user
-router.post("/firebase-callback", validateRequest, firebaseCallback);
+// Update profile (protected)
+router.patch("/me", protect, updateProfile);
+
+import { refreshToken, logout } from "../controllers/authController.js";
 
 // Refresh access token
-import { refreshToken, logout } from "../controllers/authController.js";
 
 router.post("/refresh-token", refreshToken);
 router.post("/logout", logout);

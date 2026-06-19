@@ -16,7 +16,6 @@ export default function StudentRequestDetails() {
 
   useEffect(() => {
     if (!id) return;
-    // if we already have the outpass from navigation state and it includes student.email, no need to fetch
     if (outpass && outpass.student && outpass.student.email) return;
     const fetch = async () => {
       try {
@@ -31,64 +30,93 @@ export default function StudentRequestDetails() {
     };
     fetch();
   }, [id, token]);
-  if (!outpass && !loading) return <div className="p-6">Outpass not found</div>;
+
+  if (!outpass && !loading) return (
+    <div className="min-h-screen bg-[#F5F7FA]">
+      <Navbar />
+      <div className="max-w-3xl mx-auto px-4 py-16 text-center">
+        <p className="text-gray-500">Outpass not found</p>
+      </div>
+    </div>
+  );
 
   const fmt = (d) => {
     try {
-      return new Date(d).toLocaleString();
+      return new Date(d).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" });
     } catch (e) {
       return d;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-[#F5F7FA]">
       <Navbar />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="bg-white border border-gray-100 rounded-2xl shadow p-6">
-          <h2 className="text-2xl font-semibold mb-4">
-            Outpass Request Details
-          </h2>
-
-          <div className="mb-4">
-            <h3 className="text-lg font-medium">Student</h3>
-            <p className="text-sm text-gray-700">
-              Name: {outpass.student?.name}
-            </p>
-            <p className="text-sm text-gray-700">
-              Enrollment: {outpass.student?.enrollmentNo}
-            </p>
-            <p className="text-sm text-gray-700">
-              Email: {outpass.student?.email}
-            </p>
-            <p className="text-sm text-gray-700">
-              Hostel: {outpass.student?.hostelName}
-            </p>
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+          {/* Card Header */}
+          <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900 tracking-tight">
+              Outpass Request Details
+            </h2>
+            <StatusBadge status={outpass.status} />
           </div>
 
-          <div className="mb-4">
-            <h3 className="text-lg font-medium">Outpass Info</h3>
-            <p className="text-sm text-gray-700">
-              From: {fmt(outpass.fromDate || outpass.from)}
-            </p>
-            <p className="text-sm text-gray-700">
-              To: {fmt(outpass.toDate || outpass.to)}
-            </p>
-            <p className="text-sm text-gray-700">
-              Purpose: {outpass.reason || outpass.purpose}
-            </p>
-            <div className="mt-2">
-              <span className="text-sm text-gray-600 mr-3">Status:</span>
-              <StatusBadge status={outpass.status} />
+          {/* Student Details */}
+          <div className="px-6 py-5 border-b border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">
+              Student Information
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">Name</span>
+                <p className="text-sm font-medium text-gray-900 mt-0.5">{outpass.student?.name}</p>
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">Enrollment</span>
+                <p className="text-sm font-medium text-gray-900 mt-0.5">{outpass.student?.enrollmentNo}</p>
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">Email</span>
+                <p className="text-sm font-medium text-gray-900 mt-0.5">{outpass.student?.email}</p>
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">Hostel</span>
+                <p className="text-sm font-medium text-gray-900 mt-0.5">{outpass.student?.hostelName}</p>
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-3">
+          {/* Outpass Details */}
+          <div className="px-6 py-5 border-b border-gray-100">
+            <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wider mb-3">
+              Leave Details
+            </h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">From</span>
+                <p className="text-sm font-medium text-gray-900 mt-0.5">{fmt(outpass.fromDate || outpass.from)}</p>
+              </div>
+              <div>
+                <span className="text-xs text-gray-500 uppercase tracking-wider">To</span>
+                <p className="text-sm font-medium text-gray-900 mt-0.5">{fmt(outpass.toDate || outpass.to)}</p>
+              </div>
+            </div>
+            <div className="mt-4">
+              <span className="text-xs text-gray-500 uppercase tracking-wider">Purpose</span>
+              <p className="text-sm text-gray-900 mt-0.5">{outpass.reason || outpass.purpose}</p>
+            </div>
+          </div>
+
+          {/* Back */}
+          <div className="px-6 py-4 bg-gray-50 flex gap-3">
             <button
               onClick={() => navigate(-1)}
-              className="btn btn-md btn-neutral"
+              className="btn btn-neutral"
             >
+              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
               Back
             </button>
           </div>

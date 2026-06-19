@@ -56,19 +56,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("refreshToken");
   };
 
-  // allow external components (like FinishSignIn) to set the user/token
-  const setUser = (user, newToken) => {
-    setAuthUser(user);
-    setToken(newToken || null);
-    if (user) localStorage.setItem("user", JSON.stringify(user));
-    else localStorage.removeItem("user");
-    if (newToken) localStorage.setItem("token", newToken);
-    else localStorage.removeItem("token");
-  };
-
   return (
     <AuthContext.Provider
-      value={{ authUser, token, login, signup, logout, setUser }}
+      value={{ authUser, token, login, signup, logout }}
     >
       {children}
     </AuthContext.Provider>

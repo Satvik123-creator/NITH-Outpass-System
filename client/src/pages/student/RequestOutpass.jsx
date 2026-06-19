@@ -10,7 +10,6 @@ export default function OutpassForm() {
   const { requestOutpass, loading } = useRequests();
   const navigate = useNavigate();
 
-  // form fields
   const [fullName, setFullName] = useState(authUser?.name || "");
   const [enrollment, setEnrollment] = useState(authUser?.enrollmentNo || "");
   const [room, setRoom] = useState("");
@@ -42,145 +41,166 @@ export default function OutpassForm() {
       console.error(err);
       toast.error("Something went wrong while applying.");
     }
-    // cleaned up stray identifier
   };
 
   return (
     <>
       <Navbar />
 
-      <div className="min-h-screen flex items-center justify-center p-6 relative">
-        <div className="max-w-5xl w-full px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-br from-blue-100 via-blue-150 to-blue-300 border border-gray-200 rounded-2xl shadow p-6 md:p-10">
-            <div className="text-center mb-6">
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight leading-tight">
-                Apply for Outpass
-              </h1>
-              <p className="text-sm md:text-base font-medium text-gray-900 max-w-xl mx-auto leading-relaxed mt-2">
-                Fill the form below to request an outpass. Provide accurate
-                dates and a short purpose so your request can be processed
-                quickly.
-              </p>
-            </div>
+      <div className="min-h-screen bg-[#F5F7FA] py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+              Apply for Outpass
+            </h1>
+            <p className="mt-1 text-sm text-gray-500">
+              Fill in the details below to submit an outpass request for review.
+            </p>
+          </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="text-sm font-semibold text-gray-800 mb-1 block">
-                    Full Name
-                  </label>
-                  <input
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
-                    className="w-full p-2 border-2 border-gray-700 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Your full name"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-gray-800 mb-1 block">
-                    Enrollment No.
-                  </label>
-                  <input
-                    value={enrollment}
-                    onChange={(e) =>
-                      setEnrollment(e.target.value.toUpperCase())
-                    }
-                    className="w-full p-2 border-2 border-gray-700 rounded-md text-gray-900 uppercase placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="23BCSxxx"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-gray-800 mb-1 block">
-                    Room Number
-                  </label>
-                  <input
-                    value={room}
-                    onChange={(e) => setRoom(e.target.value)}
-                    className="w-full p-2 border-2 border-gray-700 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Room No"
-                  />
+          {/* Form Card */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+            <form onSubmit={handleSubmit}>
+              {/* Section: Personal Information */}
+              <div className="px-6 py-5 border-b border-gray-100">
+                <h2 className="text-base font-semibold text-gray-900">Personal Information</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Your basic details</p>
+              </div>
+              <div className="px-6 py-5 border-b border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Full Name
+                    </label>
+                    <input
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
+                      placeholder="Your full name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Enrollment No.
+                    </label>
+                    <input
+                      value={enrollment}
+                      onChange={(e) =>
+                        setEnrollment(e.target.value.toUpperCase())
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 uppercase placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-gray-50"
+                      placeholder="23BCSxxx"
+                      required
+                      readOnly
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Room Number
+                    </label>
+                    <input
+                      value={room}
+                      onChange={(e) => setRoom(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
+                      placeholder="Room No"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div>
-                  <label className="text-sm font-semibold text-gray-800 mb-1 block">
-                    From
-                  </label>
-                  <input
-                    type="date"
-                    value={fromDate}
-                    onChange={(e) => setFromDate(e.target.value)}
-                    className="w-full p-2 border-2 border-gray-700 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-gray-800 mb-1 block">
-                    To
-                  </label>
-                  <input
-                    type="date"
-                    value={toDate}
-                    onChange={(e) => setToDate(e.target.value)}
-                    className="w-full p-2 border-2 border-gray-700 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-semibold text-gray-800 mb-1 block">
-                    Address on Leave
-                  </label>
-                  <input
-                    value={addressOnLeave}
-                    onChange={(e) => setAddressOnLeave(e.target.value)}
-                    placeholder="Address where you will stay while on leave"
-                    className="w-full p-2 border-2 border-gray-700 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+              {/* Section: Leave Details */}
+              <div className="px-6 py-5 border-b border-gray-100">
+                <h2 className="text-base font-semibold text-gray-900">Leave Details</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Duration and address while on leave</p>
+              </div>
+              <div className="px-6 py-5 border-b border-gray-100">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      From Date
+                    </label>
+                    <input
+                      type="date"
+                      value={fromDate}
+                      onChange={(e) => setFromDate(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      To Date
+                    </label>
+                    <input
+                      type="date"
+                      value={toDate}
+                      onChange={(e) => setToDate(e.target.value)}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                      Address on Leave
+                    </label>
+                    <input
+                      value={addressOnLeave}
+                      onChange={(e) => setAddressOnLeave(e.target.value)}
+                      placeholder="Address while on leave"
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div>
-                <label className="text-sm font-semibold text-gray-800 mb-1 block">
-                  Purpose of Leave
-                </label>
+              {/* Section: Purpose */}
+              <div className="px-6 py-5 border-b border-gray-100">
+                <h2 className="text-base font-semibold text-gray-900">Purpose of Leave</h2>
+                <p className="text-sm text-gray-500 mt-0.5">Briefly describe the reason for your leave</p>
+              </div>
+              <div className="px-6 py-5">
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
                   rows={4}
                   placeholder="Reason / purpose (eg. medical, personal, family function, etc.)"
-                  className="w-full p-3 border-2 border-gray-700 rounded-md text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white resize-none"
                   required
                 />
               </div>
 
-              <div className="flex items-center justify-between gap-4">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="btn btn-md btn-blue w-auto text-base font-semibold px-6"
-                >
-                  {loading ? "Submitting..." : "Apply"}
-                </button>
-
-                <div className="text-sm text-gray-700">
-                  <div>
-                    <span className="text-xs text-gray-500 mr-2">
-                      Submitted as
-                    </span>
-                    <span className="font-medium text-gray-800">
-                      {authUser?.name || "Student"}
-                    </span>
-                  </div>
-                  <div className="text-xs mt-1 text-gray-500">
-                    Status will be visible in your dashboard
-                  </div>
+              {/* Footer */}
+              <div className="px-6 py-4 bg-gray-50 rounded-b-xl border-t border-gray-100 flex items-center justify-between">
+                <div className="text-sm text-gray-500">
+                  Submitting as <span className="font-medium text-gray-700">{authUser?.name || "Student"}</span>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => navigate("/student/dashboard")}
+                    className="btn btn-neutral"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="btn btn-primary"
+                  >
+                    {loading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Submitting...
+                      </span>
+                    ) : (
+                      "Submit Request"
+                    )}
+                  </button>
                 </div>
               </div>
             </form>

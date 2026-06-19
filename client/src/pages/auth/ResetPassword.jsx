@@ -45,11 +45,16 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-[#F5F7FA]">
       <Navbar />
       <main className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="bg-white border border-gray-100 rounded-2xl shadow p-6">
-          <h2 className="text-xl font-semibold mb-4">Reset Password</h2>
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-gray-900 tracking-tight">Reset Password</h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Enter your new password below.
+            </p>
+          </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
               type="password"
@@ -57,7 +62,7 @@ export default function ResetPassword() {
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               required
-              className="w-full p-2 border border-gray-200 rounded-md"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366]"
             />
             <input
               type="password"
@@ -65,9 +70,9 @@ export default function ResetPassword() {
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
-              className="w-full p-2 border border-gray-200 rounded-md"
+              className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366]"
             />
-            <button className="btn btn-md btn-blue" disabled={submitting}>
+            <button className="btn btn-primary w-full" disabled={submitting}>
               {submitting ? "Resetting..." : "Reset Password"}
             </button>
           </form>
