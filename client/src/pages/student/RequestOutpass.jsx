@@ -47,162 +47,159 @@ export default function OutpassForm() {
     <>
       <Navbar />
 
-      <div className="min-h-screen bg-[#F5F7FA] py-8">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Page Header */}
-          <div className="mb-8">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-              Apply for Outpass
+      <div className="min-h-screen bg-[#F8FAFC] py-10 relative">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6">
+          {/* Official Portal Header */}
+          <div className="text-center mb-8 border-b-2 border-[#003366] pb-4">
+            <h1 className="text-2xl font-bold text-[#003366] tracking-wide uppercase">
+              National Institute of Technology Hamirpur
             </h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Fill in the details below to submit an outpass request for review.
+            <h2 className="text-lg font-semibold text-gray-700 mt-1">
+              Outpass Request Application Portal
+            </h2>
+            <p className="text-xs text-gray-500 mt-1">
+              Please fill all fields accurately. Submissions are routed to your hostel warden for official clearance.
             </p>
           </div>
 
-          {/* Form Card */}
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          {/* Form Container */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-md overflow-hidden">
             <form onSubmit={handleSubmit}>
-              {/* Section: Personal Information */}
-              <div className="px-6 py-5 border-b border-gray-100">
-                <h2 className="text-base font-semibold text-gray-900">Personal Information</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Your basic details</p>
+              
+              {/* Section 1: Candidate Particulars */}
+              <div className="bg-[#003366]/5 px-6 py-3 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-[#003366] uppercase tracking-wider">
+                  1. Candidate Particulars
+                </h3>
               </div>
-              <div className="px-6 py-5 border-b border-gray-100">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Full Name
-                    </label>
-                    <input
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
-                      placeholder="Your full name"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Enrollment No.
-                    </label>
-                    <input
-                      value={enrollment}
-                      onChange={(e) =>
-                        setEnrollment(e.target.value.toUpperCase())
-                      }
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 uppercase placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-gray-50"
-                      placeholder="23BCSxxx"
-                      required
-                      readOnly
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Room Number
-                    </label>
-                    <input
-                      value={room}
-                      onChange={(e) => setRoom(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
-                      placeholder="Room No"
-                    />
-                  </div>
+              <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-5 border-b border-gray-150">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                    Candidate Name
+                  </label>
+                  <input
+                    type="text"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:border-[#003366] focus:ring-1 focus:ring-[#003366] bg-white"
+                    placeholder="Enter full name"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                    Enrollment No.
+                  </label>
+                  <input
+                    type="text"
+                    value={enrollment}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-600 bg-gray-100 cursor-not-allowed font-semibold uppercase"
+                    required
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                    Room No. & Hostel
+                  </label>
+                  <input
+                    type="text"
+                    value={room}
+                    onChange={(e) => setRoom(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:border-[#003366] focus:ring-1 focus:ring-[#003366] bg-white"
+                    placeholder="e.g. 214"
+                  />
                 </div>
               </div>
 
-              {/* Section: Leave Details */}
-              <div className="px-6 py-5 border-b border-gray-100">
-                <h2 className="text-base font-semibold text-gray-900">Leave Details</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Duration and address while on leave</p>
+              {/* Section 2: Journey & Duration Details */}
+              <div className="bg-[#003366]/5 px-6 py-3 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-[#003366] uppercase tracking-wider">
+                  2. Journey & Duration Details
+                </h3>
               </div>
-              <div className="px-6 py-5 border-b border-gray-100">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      From Date
-                    </label>
-                    <input
-                      type="date"
-                      value={fromDate}
-                      onChange={(e) => setFromDate(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      To Date
-                    </label>
-                    <input
-                      type="date"
-                      value={toDate}
-                      onChange={(e) => setToDate(e.target.value)}
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                      Address on Leave
-                    </label>
-                    <input
-                      value={addressOnLeave}
-                      onChange={(e) => setAddressOnLeave(e.target.value)}
-                      placeholder="Address while on leave"
-                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white"
-                    />
-                  </div>
+              <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-5 border-b border-gray-150">
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                    Leave Commences From
+                  </label>
+                  <input
+                    type="date"
+                    value={fromDate}
+                    onChange={(e) => setFromDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:border-[#003366] focus:ring-1 focus:ring-[#003366] bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                    Leave Concludes On
+                  </label>
+                  <input
+                    type="date"
+                    value={toDate}
+                    onChange={(e) => setToDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:border-[#003366] focus:ring-1 focus:ring-[#003366] bg-white"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1.5">
+                    Address on Leave
+                  </label>
+                  <input
+                    type="text"
+                    value={addressOnLeave}
+                    onChange={(e) => setAddressOnLeave(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:border-[#003366] focus:ring-1 focus:ring-[#003366] bg-white"
+                    placeholder="Enter complete address"
+                  />
                 </div>
               </div>
 
-              {/* Section: Purpose */}
-              <div className="px-6 py-5 border-b border-gray-100">
-                <h2 className="text-base font-semibold text-gray-900">Purpose of Leave</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Briefly describe the reason for your leave</p>
+              {/* Section 3: Statement of Purpose */}
+              <div className="bg-[#003366]/5 px-6 py-3 border-b border-gray-200">
+                <h3 className="text-sm font-bold text-[#003366] uppercase tracking-wider">
+                  3. Statement of Purpose
+                </h3>
               </div>
-              <div className="px-6 py-5">
+              <div className="p-6 border-b border-gray-150">
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-2">
+                  Detailed Reason for Requesting Leave
+                </label>
                 <textarea
                   value={purpose}
                   onChange={(e) => setPurpose(e.target.value)}
                   rows={4}
-                  placeholder="Reason / purpose (eg. medical, personal, family function, etc.)"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 focus:border-[#003366] bg-white resize-none"
+                  placeholder="Provide brief details regarding the urgency or purpose of outpass request..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm text-gray-900 focus:outline-none focus:border-[#003366] focus:ring-1 focus:ring-[#003366] bg-white resize-none"
                   required
                 />
               </div>
 
-              {/* Footer */}
-              <div className="px-6 py-4 bg-gray-50 rounded-b-xl border-t border-gray-100 flex items-center justify-between">
-                <div className="text-sm text-gray-500">
-                  Submitting as <span className="font-medium text-gray-700">{authUser?.name || "Student"}</span>
+              {/* Footer Actions */}
+              <div className="px-6 py-4 bg-gray-50 flex items-center justify-between border-t border-gray-200">
+                <div className="text-[11px] text-gray-500 font-medium">
+                  Logged User: {authUser?.name} ({authUser?.role?.toUpperCase()})
                 </div>
                 <div className="flex gap-3">
                   <button
                     type="button"
                     onClick={() => navigate("/student/dashboard")}
-                    className="btn btn-neutral"
+                    className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-md text-sm font-semibold hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#003366]/20 transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="btn btn-primary"
+                    className="px-5 py-2 bg-[#003366] text-white rounded-md text-sm font-semibold hover:bg-[#002244] focus:outline-none focus:ring-2 focus:ring-[#003366]/20 transition-colors disabled:opacity-50 cursor-pointer"
                   >
-                    {loading ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        Submitting...
-                      </span>
-                    ) : (
-                      "Submit Request"
-                    )}
+                    {loading ? "Submitting..." : "Submit Application"}
                   </button>
                 </div>
               </div>
+
             </form>
           </div>
         </div>

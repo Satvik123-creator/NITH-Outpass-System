@@ -6,6 +6,7 @@ import crypto from "crypto";
 // ================= Signup =================
 export const signup = async (req, res) => {
   try {
+    console.log("Signup request body received:", req.body);
     const {
       name,
       email,
@@ -18,6 +19,7 @@ export const signup = async (req, res) => {
 
     // Basic validation
     if (!name || !email || !password || !role) {
+      console.log("Signup validation failed (missing fields):", { name, email, password: !!password, role });
       return res.status(400).json({ message: "Missing required fields" });
     }
 
@@ -56,6 +58,11 @@ export const signup = async (req, res) => {
 
     const user = new User(userData);
     await user.save();
+
+    // Clean up OTP store on successful signup
+    if (role === "warden" && otpStore[email]) {
+      delete otpStore[email];
+    }
 
     // generate token for immediate auth like login
     const token = jwt.sign(
@@ -394,7 +401,8 @@ export const verifyOtp = (req, res) => {
   console.log("Stored OTP:", otpStore[email], "Received OTP:", otp);
 
   if (otpStore[email] && otpStore[email] == otp) {
-    delete otpStore[email]; // remove OTP after verification
+    // Keep the OTP stored until signup completes so that any validation errors during signup 
+    // do not force the user to request a brand new OTP.
     res.status(200).json({ message: "OTP verified successfully" });
   } else {
     res.status(400).json({ message: "Invalid OTP" });
