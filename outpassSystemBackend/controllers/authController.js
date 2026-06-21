@@ -405,8 +405,10 @@ export const verifyOtp = (req, res) => {
 export const forgotPassword = async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ message: "Email is required" });
+  let resetUrl = "";
   try {
-    const user = await User.findOne({ email });
+    // Case-insensitive query for user email
+    const user = await User.findOne({ email: new RegExp(`^${email.trim()}$`, "i") });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     // create token
@@ -415,9 +417,8 @@ export const forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 1000 * 60 * 60; // 1 hour
     await user.save();
 
-    const resetUrl = `${
-      process.env.FRONTEND_URL || "http://localhost:3000"
-    }/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+    const origin = req.headers.origin || process.env.FRONTEND_URL || "http://localhost:5173";
+    resetUrl = `${origin}/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
     const mailHost = process.env.EMAIL_HOST || "smtp.gmail.com";
     const mailPort = process.env.EMAIL_PORT
@@ -469,7 +470,7 @@ export const resetPassword = async (req, res) => {
 
   try {
     const user = await User.findOne({
-      email,
+      email: new RegExp(`^${email.trim()}$`, "i"),
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
     });

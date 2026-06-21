@@ -38,7 +38,10 @@ export default function ResetPassword() {
       toast.success("Password reset successful. Please login.");
       navigate("/");
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to reset password");
+      const errMsg = err.response?.data?.errors
+        ? err.response.data.errors.map((e) => e.msg).join(", ")
+        : err.response?.data?.message || "Failed to reset password";
+      toast.error(errMsg);
     } finally {
       setSubmitting(false);
     }

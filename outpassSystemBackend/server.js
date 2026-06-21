@@ -15,10 +15,31 @@ dotenv.config();
 const app = express();
 const FRONTEND_ORIGIN = process.env.FRONTEND_URL || "http://localhost:5173";
 console.debug("Starting server with FRONTEND_URL:", FRONTEND_ORIGIN);
+
+const allowedOrigins = [
+  FRONTEND_ORIGIN,
+  "http://localhost:5173",
+  "http://localhost:5174",
+  "http://localhost:3000",
+].filter(Boolean);
+
 // Sentry was removed from this project; logging remains enabled
 app.use(
   cors({
-    origin: FRONTEND_ORIGIN,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      
+      const isAllowed = allowedOrigins.includes(origin) || 
+                        /^https?:\/\/localhost:\d+$/.test(origin) ||
+                        /^https?:\/\/127\.0\.0\.1:\d+$/.test(origin);
+      
+      if (isAllowed) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`));
+      }
+    },
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
